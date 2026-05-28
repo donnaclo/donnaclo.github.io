@@ -450,6 +450,196 @@
   /* ── VENDA PAGE BOTTOM PADDING ───────────────────────── */
   #page-venda .container { padding-bottom: 0; }
   #page-venda { padding-bottom: 100px; }
+  /* ── ENCOMENDAS PAGE ─────────────────────────────────── */
+  #page-encomendas { padding-bottom: 40px; }
+
+  /* --- Nova Encomenda form panel --- */
+  .enc-form-panel {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .enc-form-header {
+    background: var(--brown-dark);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .enc-form-header span {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--brown-pale);
+  }
+  .enc-form-arrow {
+    font-size: 14px; color: var(--brown-pale);
+    transition: transform 0.2s;
+  }
+  .enc-form-arrow.open { transform: rotate(180deg); }
+  .enc-form-body {
+    padding: 16px;
+    display: none;
+  }
+  .enc-form-body.open { display: block; }
+
+  .enc-field {
+    display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;
+  }
+  .enc-field label {
+    font-size: 11px; color: var(--gray-soft); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .enc-field input, .enc-field textarea, .enc-field select {
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--brown-dark);
+    outline: none; width: 100%; -webkit-appearance: none;
+    transition: border-color 0.15s;
+  }
+  .enc-field input:focus, .enc-field textarea:focus, .enc-field select:focus {
+    border-color: var(--brown-light);
+  }
+  .enc-field textarea { resize: vertical; min-height: 72px; }
+  .enc-fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn-enc-salvar {
+    width: 100%; padding: 12px;
+    background: var(--brown-light); color: white; border: none;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 4px;
+  }
+  .btn-enc-salvar:active { background: var(--brown-mid); transform: scale(0.98); }
+
+  /* --- Filter bar --- */
+  .enc-filter-bar {
+    display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .enc-filter-bar::-webkit-scrollbar { display: none; }
+  .enc-filter-btn {
+    flex-shrink: 0; padding: 6px 14px;
+    border-radius: 20px; border: 1px solid var(--border);
+    background: var(--warm-white); color: var(--gray-soft);
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .enc-filter-btn.active {
+    background: var(--brown-dark); color: var(--brown-pale); border-color: var(--brown-dark);
+  }
+
+  /* --- Stats strip --- */
+  .enc-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .enc-stat {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 12px; text-align: center;
+  }
+  .enc-stat-val {
+    font-family: 'Playfair Display', serif; font-size: 20px; color: var(--brown-dark);
+    line-height: 1;
+  }
+  .enc-stat-lbl {
+    font-size: 9px; color: var(--gray-soft); text-transform: uppercase;
+    letter-spacing: 0.1em; margin-top: 4px;
+  }
+
+  /* --- Encomenda cards --- */
+  .enc-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px;
+    overflow: hidden; transition: box-shadow 0.15s;
+  }
+  .enc-card:active { box-shadow: 0 2px 8px rgba(61,31,10,0.12); }
+
+  .enc-card-top {
+    display: flex; align-items: stretch; gap: 0;
+  }
+
+  /* Left colour strip = urgency */
+  .enc-strip {
+    width: 5px; flex-shrink: 0;
+    background: var(--gray-soft);
+    border-radius: 14px 0 0 0;
+  }
+  .enc-strip.urgente  { background: var(--red-warn); }
+  .enc-strip.proximo  { background: #D97B20; }
+  .enc-strip.ok       { background: var(--green-ok); }
+  .enc-strip.entregue { background: var(--gray-soft); }
+
+  .enc-card-main { flex: 1; padding: 12px 14px 12px 12px; min-width: 0; }
+
+  .enc-card-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  }
+  .enc-card-cliente {
+    font-size: 15px; font-weight: 500; color: var(--brown-dark);
+    line-height: 1.2; flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .enc-status-badge {
+    flex-shrink: 0; font-size: 10px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+  }
+  .enc-status-badge.pendente  { background: #FCECEA; color: var(--red-warn); }
+  .enc-status-badge.pronto    { background: #FEF3E2; color: #B85C00; }
+  .enc-status-badge.entregue  { background: #EBF6EF; color: var(--green-ok); }
+
+  .enc-card-desc {
+    font-size: 13px; color: var(--gray-soft); margin-top: 5px;
+    line-height: 1.4; word-break: break-word;
+  }
+
+  .enc-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 10px; padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .enc-date-block { display: flex; flex-direction: column; gap: 1px; }
+  .enc-date-label { font-size: 9px; color: var(--gray-soft); text-transform: uppercase; letter-spacing: 0.1em; }
+  .enc-date-val   { font-size: 13px; font-weight: 500; color: var(--brown-dark); }
+  .enc-dias {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 20px; background: var(--cream);
+    color: var(--gray-soft);
+  }
+  .enc-dias.urgente { background: #FCECEA; color: var(--red-warn); }
+  .enc-dias.proximo { background: #FEF3E2; color: #B85C00; }
+  .enc-dias.hoje    { background: #EBF6EF; color: var(--green-ok); }
+
+  .enc-card-actions {
+    display: flex; gap: 6px; padding: 0 14px 12px 17px;
+  }
+  .enc-action-btn {
+    flex: 1; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--cream); font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    color: var(--gray-soft); transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent; text-align: center;
+  }
+  .enc-action-btn.pronto-btn   { border-color: #D97B20; color: #B85C00; background: #FEF3E2; }
+  .enc-action-btn.entregue-btn { border-color: var(--green-ok); color: var(--green-ok); background: #EBF6EF; }
+  .enc-action-btn.del-btn      { border-color: #ddd; color: #bbb; }
+
+  .enc-empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--gray-soft); font-size: 14px; line-height: 1.7;
+  }
+  .enc-empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+  .enc-loading {
+    text-align: center; padding: 40px 20px;
+    color: var(--gray-soft); font-size: 13px;
+  }
+  .enc-valor-field input { font-size: 16px; font-weight: 500; }
+
 </style>
 </head>
 <body>
@@ -458,8 +648,9 @@
   <h1>Donna Clô</h1>
   <p class="subtitle">Dolci fatti a mano</p>
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-venda"    onclick="switchTab('venda')">📋 Registrar Venda</button>
-    <button class="tab-btn"        id="tab-consulta" onclick="switchTab('consulta')">🔍 Consultar Cliente</button>
+    <button class="tab-btn active" id="tab-venda"      onclick="switchTab('venda')">📋 Venda</button>
+    <button class="tab-btn"        id="tab-consulta"   onclick="switchTab('consulta')">🔍 Clientes</button>
+    <button class="tab-btn"        id="tab-encomendas" onclick="switchTab('encomendas')">📦 Encomendas</button>
   </div>
 </header>
 
@@ -625,6 +816,79 @@
 </div><!-- .container -->
 </div><!-- #page-consulta -->
 
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: ENCOMENDAS
+════════════════════════════════════════════════════════ -->
+<div id="page-encomendas" class="page">
+<div class="container">
+
+  <!-- NOVA ENCOMENDA (collapsible) -->
+  <div class="enc-form-panel" style="margin-top:4px;">
+    <div class="enc-form-header" onclick="toggleEncForm()">
+      <span>+ Nova Encomenda</span>
+      <span class="enc-form-arrow" id="enc-form-arrow">▾</span>
+    </div>
+    <div class="enc-form-body" id="enc-form-body">
+      <div class="enc-field">
+        <label>Cliente</label>
+        <input type="text" id="enc-cliente" placeholder="Nome do cliente" autocomplete="off">
+      </div>
+      <div class="enc-fields-row">
+        <div class="enc-field">
+          <label>Data de entrega</label>
+          <input type="date" id="enc-data">
+        </div>
+        <div class="enc-field enc-valor-field">
+          <label>Valor (R$)</label>
+          <input type="number" id="enc-valor" placeholder="0,00" step="0.01" min="0">
+        </div>
+      </div>
+      <div class="enc-field">
+        <label>Descrição do pedido</label>
+        <textarea id="enc-descricao" placeholder="Ex: 1 Bolo Leite Ninho 20x20, 10 alfajores, entregar embalado..."></textarea>
+      </div>
+      <div class="enc-field">
+        <label>Empresa / Local de entrega (opcional)</label>
+        <input type="text" id="enc-empresa" placeholder="Ex: Vital, residência, escola...">
+      </div>
+      <button class="btn-enc-salvar" onclick="salvarEncomenda()">Salvar Encomenda</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="enc-stats">
+    <div class="enc-stat">
+      <div class="enc-stat-val" id="enc-stat-total">0</div>
+      <div class="enc-stat-lbl">Total</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:var(--red-warn)" id="enc-stat-pendentes">0</div>
+      <div class="enc-stat-lbl">Pendentes</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:#D97B20" id="enc-stat-prontos">0</div>
+      <div class="enc-stat-lbl">Prontos</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="enc-filter-bar">
+    <button class="enc-filter-btn active" id="ef-todos"     onclick="setEncFilter('todos')">Todas</button>
+    <button class="enc-filter-btn"        id="ef-pendente"  onclick="setEncFilter('pendente')">⏳ Pendentes</button>
+    <button class="enc-filter-btn"        id="ef-pronto"    onclick="setEncFilter('pronto')">✅ Prontos</button>
+    <button class="enc-filter-btn"        id="ef-entregue"  onclick="setEncFilter('entregue')">📦 Entregues</button>
+  </div>
+
+  <!-- CARDS LIST -->
+  <div id="enc-list">
+    <div class="enc-loading">
+      <div class="spinner"></div>Carregando encomendas...
+    </div>
+  </div>
+
+</div><!-- .container -->
+</div><!-- #page-encomendas -->
+
 <!-- TOTAL BAR (venda only) -->
 <div class="total-bar" id="total-bar">
   <div style="min-width:0;flex:1;overflow:hidden;">
@@ -637,7 +901,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyadTJTZ0IrW6gr32yppWWIMtCrlM32j2BGpj6-fZiaupzO-O_mHwKIlP8dcdyDW5F-/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2vB6dTLXcl-jPasZIj_UHKv-9_Bu-Gx1GiVhJ2AWkvmjfl36g1MjSO6HVwPn0QxG0/exe';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {
@@ -682,11 +946,12 @@ window.onload = () => {
 
 // ── TABS ────────────────────────────────────────────────
 function switchTab(tab) {
-  document.getElementById('page-venda').classList.toggle('active', tab === 'venda');
-  document.getElementById('page-consulta').classList.toggle('active', tab === 'consulta');
-  document.getElementById('tab-venda').classList.toggle('active', tab === 'venda');
-  document.getElementById('tab-consulta').classList.toggle('active', tab === 'consulta');
+  ['venda','consulta','encomendas'].forEach(t => {
+    document.getElementById('page-'+t).classList.toggle('active', t === tab);
+    document.getElementById('tab-'+t).classList.toggle('active', t === tab);
+  });
   document.getElementById('total-bar').classList.toggle('hidden', tab !== 'venda');
+  if (tab === 'encomendas') loadEncomendas();
 }
 
 // ── VENDA LOGIC ─────────────────────────────────────────
@@ -966,6 +1231,217 @@ function renderConsulta(data) {
     document.getElementById('list-historico').innerHTML = sorted.map(r => histItem(r)).join('');
   }
 }
+// ── ENCOMENDAS ──────────────────────────────────────────
+let encFilter = 'todos';
+let encAll = []; // cache
+
+function toggleEncForm() {
+  const body  = document.getElementById('enc-form-body');
+  const arrow = document.getElementById('enc-form-arrow');
+  const open  = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+}
+
+function setEncFilter(f) {
+  encFilter = f;
+  ['todos','pendente','pronto','entregue'].forEach(k => {
+    document.getElementById('ef-'+k).classList.toggle('active', k === f);
+  });
+  renderEncCards(encAll);
+}
+
+function loadEncomendas() {
+  document.getElementById('enc-list').innerHTML =
+    '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
+  fetch(`${SCRIPT_URL}?action=encomendas`)
+    .then(r => r.json())
+    .then(data => {
+      encAll = Array.isArray(data.encomendas) ? data.encomendas : [];
+      renderEncCards(encAll);
+    })
+    .catch(() => {
+      document.getElementById('enc-list').innerHTML =
+        '<div class="enc-empty"><div class="enc-empty-icon">⚠️</div>Erro ao carregar. Verifique a conexão.</div>';
+    });
+}
+
+function renderEncCards(list) {
+  // Filter
+  const filtered = encFilter === 'todos'
+    ? list
+    : list.filter(e => (e.status||'pendente').toLowerCase() === encFilter);
+
+  // Sort by delivery date asc (pendentes/prontos first, entregues last)
+  const sorted = [...filtered].sort((a, b) => {
+    const da = parseDateISO(a.dataEntrega);
+    const db = parseDateISO(b.dataEntrega);
+    return da - db;
+  });
+
+  // Stats (always from full list)
+  const pendentes = list.filter(e => (e.status||'pendente') === 'pendente').length;
+  const prontos   = list.filter(e => (e.status||'') === 'pronto').length;
+  document.getElementById('enc-stat-total').textContent     = list.length;
+  document.getElementById('enc-stat-pendentes').textContent = pendentes;
+  document.getElementById('enc-stat-prontos').textContent   = prontos;
+
+  if (sorted.length === 0) {
+    document.getElementById('enc-list').innerHTML = `
+      <div class="enc-empty">
+        <div class="enc-empty-icon">📦</div>
+        ${encFilter === 'todos' ? 'Nenhuma encomenda cadastrada.<br>Use o painel acima para adicionar.' : 'Nenhuma encomenda nesta categoria.'}
+      </div>`;
+    return;
+  }
+
+  document.getElementById('enc-list').innerHTML = sorted.map(enc => encCard(enc)).join('');
+}
+
+function parseDateISO(str) {
+  if (!str) return new Date(9999,0,1);
+  // Accepts "dd/MM/yyyy" or "yyyy-MM-dd"
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+    const [d,m,y] = str.split('/');
+    return new Date(+y, +m-1, +d);
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const [y,m,d] = str.split('-');
+    return new Date(+y, +m-1, +d);
+  }
+  return new Date(str);
+}
+
+function diasRestantes(dataEntregaStr) {
+  if (!dataEntregaStr) return null;
+  const entrega = parseDateISO(dataEntregaStr);
+  const hoje    = new Date(); hoje.setHours(0,0,0,0);
+  return Math.round((entrega - hoje) / 86400000);
+}
+
+function encCard(enc) {
+  const status   = (enc.status || 'pendente').toLowerCase();
+  const entregue = status === 'entregue';
+  const pronto   = status === 'pronto';
+
+  const dias = entregue ? null : diasRestantes(enc.dataEntrega);
+
+  // Strip colour
+  let stripClass = 'ok';
+  if (entregue) stripClass = 'entregue';
+  else if (dias !== null && dias < 0)  stripClass = 'urgente';
+  else if (dias !== null && dias <= 2) stripClass = 'urgente';
+  else if (dias !== null && dias <= 5) stripClass = 'proximo';
+
+  // Dias pill
+  let diasHtml = '';
+  if (!entregue && dias !== null) {
+    let diasClass = '';
+    let diasLabel = '';
+    if (dias < 0)      { diasClass = 'urgente'; diasLabel = `${Math.abs(dias)}d atrasada`; }
+    else if (dias === 0){ diasClass = 'hoje';    diasLabel = 'Hoje!'; }
+    else if (dias === 1){ diasClass = 'urgente'; diasLabel = 'Amanhã'; }
+    else if (dias <= 5) { diasClass = 'proximo'; diasLabel = `${dias} dias`; }
+    else                { diasLabel = `${dias} dias`; }
+    diasHtml = `<span class="enc-dias ${diasClass}">${diasLabel}</span>`;
+  }
+
+  // Status badge
+  const badgeClass = status === 'pendente' ? 'pendente' : status === 'pronto' ? 'pronto' : 'entregue';
+  const badgeLabel = status === 'pendente' ? '⏳ Pendente' : status === 'pronto' ? '✅ Pronto' : '📦 Entregue';
+
+  // Action buttons
+  let actions = '';
+  if (!entregue) {
+    if (!pronto) {
+      actions += `<button class="enc-action-btn pronto-btn" onclick="updateEncStatus('${enc.id}','pronto')">✅ Marcar Pronto</button>`;
+    }
+    actions += `<button class="enc-action-btn entregue-btn" onclick="updateEncStatus('${enc.id}','entregue')">📦 Entregue</button>`;
+  }
+
+  const empresa = enc.empresa ? `<span style="color:var(--brown-light);"> · ${enc.empresa}</span>` : '';
+  const valor   = parseFloat(enc.valor) > 0 ? `<span style="font-weight:500;color:var(--brown-mid);">R$ ${parseFloat(enc.valor).toFixed(2).replace('.',',')}</span>` : '';
+
+  return `
+  <div class="enc-card" id="enccard-${enc.id}">
+    <div class="enc-card-top">
+      <div class="enc-strip ${stripClass}"></div>
+      <div class="enc-card-main">
+        <div class="enc-card-head">
+          <div class="enc-card-cliente">${enc.cliente || '—'}${empresa}</div>
+          <span class="enc-status-badge ${badgeClass}">${badgeLabel}</span>
+        </div>
+        ${enc.descricao ? `<div class="enc-card-desc">${enc.descricao}</div>` : ''}
+        <div class="enc-card-footer">
+          <div class="enc-date-block">
+            <div class="enc-date-label">Entrega</div>
+            <div class="enc-date-val">${fmtDate(enc.dataEntrega)}</div>
+            ${valor ? `<div style="margin-top:2px;">${valor}</div>` : ''}
+          </div>
+          ${diasHtml}
+        </div>
+      </div>
+    </div>
+    ${actions ? `<div class="enc-card-actions">${actions}</div>` : ''}
+  </div>`;
+}
+
+function salvarEncomenda() {
+  const cliente    = document.getElementById('enc-cliente').value.trim();
+  const dataEnt    = document.getElementById('enc-data').value;
+  const descricao  = document.getElementById('enc-descricao').value.trim();
+  const empresa    = document.getElementById('enc-empresa').value.trim();
+  const valor      = document.getElementById('enc-valor').value;
+
+  if (!cliente)  { showToast('⚠️ Informe o nome do cliente'); return; }
+  if (!dataEnt)  { showToast('⚠️ Informe a data de entrega'); return; }
+  if (!descricao){ showToast('⚠️ Descreva o pedido'); return; }
+
+  const payload = {
+    tipo: 'encomenda',
+    cliente, dataEntrega: dataEnt, descricao, empresa,
+    valor: parseFloat(valor) || 0,
+    status: 'pendente'
+  };
+
+  showToast('Salvando...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    showToast('✓ Encomenda salva!');
+    document.getElementById('enc-cliente').value   = '';
+    document.getElementById('enc-data').value      = '';
+    document.getElementById('enc-descricao').value = '';
+    document.getElementById('enc-empresa').value   = '';
+    document.getElementById('enc-valor').value     = '';
+    // Close form
+    document.getElementById('enc-form-body').classList.remove('open');
+    document.getElementById('enc-form-arrow').classList.remove('open');
+    setTimeout(loadEncomendas, 800);
+  })
+  .catch(() => showToast('⚠️ Erro ao salvar.'));
+}
+
+function updateEncStatus(id, novoStatus) {
+  const labels = { pronto: 'Pronto', entregue: 'Entregue' };
+  showToast(`Atualizando para ${labels[novoStatus]}...`);
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'update_encomenda', id, status: novoStatus })
+  })
+  .then(() => {
+    showToast('✓ Status atualizado!');
+    // Optimistic update in cache
+    const enc = encAll.find(e => e.id === id);
+    if (enc) enc.status = novoStatus;
+    renderEncCards(encAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao atualizar.'));
+}
+
 // ── TOAST ───────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
