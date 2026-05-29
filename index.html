@@ -1135,7 +1135,6 @@ function limparTudo() {
   }
   document.getElementById('cliente').value = '';
   document.getElementById('obs').value = '';
-  document.getElementById('empresa-outro').value = '';
   // reset reserva
   document.getElementById('is-reserva').value = '0';
   document.getElementById('btn-reserva').classList.remove('selected');
@@ -1143,7 +1142,6 @@ function limparTudo() {
   document.getElementById('modo-indicator').className = 'venda-mode-indicator modo-venda';
   document.getElementById('modo-indicator').textContent = '✅ Modo: Venda Normal';
   selectPayment('Pago');
-  selectEmpresa('Outro');
   updateTotal();
   showToast('Formulário limpo ✓');
 }
