@@ -901,7 +901,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0N_fDGlTL_JVewBtmVeYUQHjvN4jlwukM2LYADfqHoiEudQFeeOXS-8L9qChvsKT8/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzOOIDq9G76eiHDhxdK4ArC8fFaEwHIelSXDO8cWOFcTEukU4S8doZ28bJpvGoS7nJc/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {
@@ -1351,7 +1351,9 @@ function encCard(enc) {
 
   // Action buttons
   let actions = '';
-  if (!entregue) {
+  if (entregue) {
+    actions += `<button class="enc-action-btn del-btn" onclick="arquivarEncomenda('${enc.id}')">🗑️ Apagar</button>`;
+  } else {
     if (!pronto) {
       actions += `<button class="enc-action-btn pronto-btn" onclick="updateEncStatus('${enc.id}','pronto')">✅ Marcar Pronto</button>`;
     }
@@ -1440,6 +1442,22 @@ function updateEncStatus(id, novoStatus) {
     renderEncCards(encAll);
   })
   .catch(() => showToast('⚠️ Erro ao atualizar.'));
+}
+
+function arquivarEncomenda(id) {
+  if (!confirm('Apagar esta encomenda e lançar como venda?')) return;
+  showToast('Lançando na venda...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'archive_encomenda', id })
+  })
+  .then(() => {
+    showToast('✓ Encomenda lançada na venda e apagada!');
+    encAll = encAll.filter(e => e.id !== id);
+    renderEncCards(encAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao apagar.'));
 }
 
 // ── TOAST ───────────────────────────────────────────────
