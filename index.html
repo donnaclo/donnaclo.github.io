@@ -1039,10 +1039,10 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2aOE7imXBhjMnwm7kwGj16HTxLQWpPA7dQxOjfvU68XyAAbxcHrMO7sdDQ6U7IChW/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwArgS-a6-eq-RScCFE8rgDVJCTAxgcnYHCocmBIddy2mg9a1bD9diBrUiZaV-pTjmV/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
-const PRODUCTS = {
+const PRODUCTS = {  
   alfajor:           { name: 'Alfajor',                 price: 9  },
   pao_mel:           { name: 'Pão de Mel',              price: 11 },
   queijadinha:       { name: 'Queijadinha',             price: 8  },
@@ -1192,20 +1192,25 @@ function registrarVenda() {
   const isReserva = document.getElementById('is-reserva').value === '1';
 
   if (isReserva) {
-    // Salva na aba Reservas
-    const payload = {
-      tipo: 'reserva',
-      data, cliente, empresa,
-      itens: itensList.join(', '),
-      total: total.toFixed(2),
-      pagamento, obs
-    };
-    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
-    showToast('Salvando reserva...');
-    fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); })
-      .catch(() => showToast('⚠️ Erro ao enviar.'));
-  } else {
+  const payload = {
+    tipo: 'reserva',
+    data, cliente, empresa,
+    itens: itensList.join(', '),
+    total: total.toFixed(2),
+    obs
+  };
+  for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+
+  showToast('Salvando reserva...');
+  fetch(SCRIPT_URL, {
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  })
+  .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); })
+  .catch(() => showToast('⚠️ Erro ao enviar.'));
+} else {
     // Salva na aba Vendas (comportamento padrão)
     const payload = { data, cliente, empresa, itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs };
     for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
@@ -1732,18 +1737,19 @@ function resCard(r) {
   const empresa = r.empresa ? ` · <span style="color:var(--brown-light)">${r.empresa}</span>` : '';
 
   let actions = '';
-  if (!vendida) {
-    actions = `
-      <div class="res-actions">
-        <button class="res-action-btn vender-btn"  onclick="venderReserva('${r.id}')">✅ Confirmar Venda</button>
-        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
-      </div>`;
-  } else {
-    actions = `
-      <div class="res-actions">
-        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
-      </div>`;
-  }
+if (!vendida) {
+  actions = `
+    <div class="res-actions">
+      <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pago')">✅ Retirou: Pago</button>
+      <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pendente')">⏳ Retirou: Pendente</button>
+      <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+    </div>`;
+} else {
+  actions = `
+    <div class="res-actions">
+      <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+    </div>`;
+}
 
   return `
   <div class="res-card" id="rescard-${r.id}">
@@ -1765,10 +1771,10 @@ function resCard(r) {
   </div>`;
 }
 
-function venderReserva(id) {
+function retirarReserva(id, pagamento) {
   const res = resAll.find(r => r.id === id);
   if (!res) return;
-  showToast('Confirmando venda...');
+  showToast(`Marcando como ${pagamento}...`);
 
   const hoje = new Date();
   const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
@@ -1777,24 +1783,23 @@ function venderReserva(id) {
     method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({
-      tipo: 'vender_reserva',
+      tipo: 'retirar_reserva',
       res_id: id,
-      data:      dataHoje,
-      cliente:   res.cliente,
-      empresa:   res.empresa || '',
-      itens:     res.itens,
-      total:     res.total,
-      pagamento: 'Pago',
-      obs:       res.obs || ''
+      data: dataHoje,
+      cliente: res.cliente,
+      empresa: res.empresa || '',
+      itens: res.itens,
+      total: res.total,
+      pagamento: pagamento,
+      obs: res.obs || ''
     })
   })
   .then(() => {
-    showToast('✓ Venda confirmada e registrada!');
-    const r = resAll.find(x => x.id === id);
-    if (r) r.status = 'vendida';
+    showToast(`✓ Reserva retirada e registrada como ${pagamento}!`);
+    resAll = resAll.filter(x => x.id !== id);
     renderResCards(resAll);
   })
-  .catch(() => showToast('⚠️ Erro ao confirmar.'));
+  .catch(() => showToast('⚠️ Erro ao confirmar retirada.'));
 }
 
 function apagarReserva(id) {
