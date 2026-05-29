@@ -73,27 +73,34 @@
   }
   .tab-btn {
     flex: 1;
-    padding: 10px 8px;
+    padding: 10px 4px;
     background: transparent;
     border: none;
     font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    color: rgba(232,201,154,0.45);
+    letter-spacing: 0.06em;
+    color: rgba(232,201,154,0.4);
     cursor: pointer;
     position: relative;
     text-transform: uppercase;
     transition: color 0.15s;
     -webkit-tap-highlight-color: transparent;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
   }
-  .tab-btn.active {
-    color: var(--brown-pale);
+  .tab-btn .tab-emoji { font-size: 18px; line-height: 1; }
+  .tab-btn .tab-label {
+    font-size: 9px; letter-spacing: 0.1em;
+    max-width: 0; overflow: hidden; white-space: nowrap;
+    opacity: 0; transition: max-width 0.25s ease, opacity 0.2s ease;
   }
+  .tab-btn.active { color: var(--brown-pale); }
+  .tab-btn.active .tab-label { max-width: 80px; opacity: 1; }
   .tab-btn.active::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 16%; right: 16%;
+    bottom: 0; left: 20%; right: 20%;
     height: 2px;
     background: var(--brown-light);
     border-radius: 2px 2px 0 0;
@@ -638,7 +645,81 @@
     text-align: center; padding: 40px 20px;
     color: var(--gray-soft); font-size: 13px;
   }
-  .enc-valor-field input { font-size: 16px; font-weight: 500; }
+  /* ── RESERVA TOGGLE ─────────────────────────────────── */
+  .reserva-toggle-wrap {
+    margin-top: 10px;
+  }
+  .reserva-btn {
+    width: 100%; padding: 11px;
+    border-radius: 10px; border: 1px solid var(--border);
+    background: var(--warm-white);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; color: var(--gray-soft);
+    transition: all 0.15s; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reserva-btn.selected {
+    background: #EEF2FF; border-color: #6366F1; color: #4338CA;
+  }
+  .venda-mode-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 8px; padding: 7px 12px;
+    border-radius: 8px; font-size: 12px; font-weight: 500;
+  }
+  .venda-mode-indicator.modo-venda   { background: #EBF6EF; color: var(--green-ok); }
+  .venda-mode-indicator.modo-reserva { background: #EEF2FF; color: #4338CA; }
+
+  /* ── RESERVAS PAGE ───────────────────────────────────── */
+  #page-reservas { padding-bottom: 40px; }
+
+  .res-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+  }
+  .res-strip {
+    width: 5px; flex-shrink: 0; background: #6366F1;
+    border-radius: 14px 0 0 14px;
+  }
+  .res-card-top { display: flex; align-items: stretch; }
+  .res-card-main { flex: 1; padding: 12px 14px 12px 12px; min-width: 0; }
+  .res-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .res-card-cliente {
+    font-size: 15px; font-weight: 500; color: var(--brown-dark);
+    flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .res-badge {
+    flex-shrink: 0; font-size: 10px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    background: #EEF2FF; color: #4338CA;
+  }
+  .res-itens {
+    font-size: 13px; color: var(--gray-soft); margin-top: 5px;
+    line-height: 1.4; word-break: break-word;
+  }
+  .res-card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .res-date { font-size: 12px; color: var(--gray-soft); }
+  .res-total { font-size: 14px; font-weight: 500; color: var(--brown-dark); }
+  .res-actions { display: flex; gap: 6px; padding: 0 14px 12px 17px; }
+  .res-action-btn {
+    flex: 1; padding: 7px 6px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--cream); font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    color: var(--gray-soft); transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent; text-align: center;
+  }
+  .res-action-btn.vender-btn { border-color: var(--green-ok); color: var(--green-ok); background: #EBF6EF; }
+  .res-action-btn.del-res-btn { border-color: #ddd; color: #aaa; }
+  .res-empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--gray-soft); font-size: 14px; line-height: 1.7;
+  }
+  .res-stat-val { color: #4338CA; }
+
+  /* ── ARCHIVE / DELETE btn on entregue cards ──────────── */
+  .enc-action-btn.arquivar-btn { border-color: var(--brown-light); color: var(--brown-mid); background: #F6ECDE; }
 
 </style>
 </head>
@@ -648,9 +729,18 @@
   <h1>Donna Clô</h1>
   <p class="subtitle">Dolci fatti a mano</p>
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-venda"      onclick="switchTab('venda')">📋 Venda</button>
-    <button class="tab-btn"        id="tab-consulta"   onclick="switchTab('consulta')">🔍 Clientes</button>
-    <button class="tab-btn"        id="tab-encomendas" onclick="switchTab('encomendas')">📦 Encomendas</button>
+    <button class="tab-btn active" id="tab-venda"      onclick="switchTab('venda')">
+      <span class="tab-emoji">📋</span><span class="tab-label">Venda</span>
+    </button>
+    <button class="tab-btn" id="tab-consulta"   onclick="switchTab('consulta')">
+      <span class="tab-emoji">🔍</span><span class="tab-label">Clientes</span>
+    </button>
+    <button class="tab-btn" id="tab-encomendas" onclick="switchTab('encomendas')">
+      <span class="tab-emoji">📦</span><span class="tab-label">Encomendas</span>
+    </button>
+    <button class="tab-btn" id="tab-reservas"   onclick="switchTab('reservas')">
+      <span class="tab-emoji">📄</span><span class="tab-label">Reservas</span>
+    </button>
   </div>
 </header>
 
@@ -695,6 +785,16 @@
     <button class="pay-btn"               id="btn-pendente"  onclick="selectPayment('Pendente')">⏳ Pendente</button>
   </div>
   <input type="hidden" id="pagamento" value="Pago">
+
+  <div class="reserva-toggle-wrap">
+    <button class="reserva-btn" id="btn-reserva" onclick="toggleReserva()">
+      📄 Registrar como Reserva
+    </button>
+    <div class="venda-mode-indicator modo-venda" id="modo-indicator">
+      ✅ Modo: Venda Normal
+    </div>
+  </div>
+  <input type="hidden" id="is-reserva" value="0">
 
   <p class="section-label">Produtos</p>
 
@@ -889,6 +989,44 @@
 </div><!-- .container -->
 </div><!-- #page-encomendas -->
 
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: RESERVAS
+════════════════════════════════════════════════════════ -->
+<div id="page-reservas" class="page">
+<div class="container">
+
+  <p class="section-label" style="margin-top:4px;">Reservas</p>
+
+  <!-- stats -->
+  <div class="enc-stats" style="margin-bottom:16px;">
+    <div class="enc-stat">
+      <div class="enc-stat-val res-stat-val" id="res-stat-total">0</div>
+      <div class="enc-stat-lbl">Total</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:var(--brown-light)" id="res-stat-valor">R$ 0</div>
+      <div class="enc-stat-lbl">Em reserva</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:var(--green-ok)" id="res-stat-vendidas">0</div>
+      <div class="enc-stat-lbl">Vendidas</div>
+    </div>
+  </div>
+
+  <!-- filter -->
+  <div class="enc-filter-bar">
+    <button class="enc-filter-btn active" id="rf-todos"   onclick="setResFilter('todos')">Todas</button>
+    <button class="enc-filter-btn"        id="rf-reserva" onclick="setResFilter('reserva')">📄 Reservadas</button>
+    <button class="enc-filter-btn"        id="rf-vendida" onclick="setResFilter('vendida')">✅ Vendidas</button>
+  </div>
+
+  <div id="res-list">
+    <div class="enc-loading"><div class="spinner"></div>Carregando...</div>
+  </div>
+
+</div>
+</div>
+
 <!-- TOTAL BAR (venda only) -->
 <div class="total-bar" id="total-bar">
   <div style="min-width:0;flex:1;overflow:hidden;">
@@ -901,7 +1039,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-E0m2opL_sPfWr_cVjSrrsez-QqIH0_-tPqmdGTF6JAynwyhvcY_NI19AZY8ygkXW/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby2aOE7imXBhjMnwm7kwGj16HTxLQWpPA7dQxOjfvU68XyAAbxcHrMO7sdDQ6U7IChW/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {
@@ -946,12 +1084,13 @@ window.onload = () => {
 
 // ── TABS ────────────────────────────────────────────────
 function switchTab(tab) {
-  ['venda','consulta','encomendas'].forEach(t => {
+  ['venda','consulta','encomendas','reservas'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('active', t === tab);
     document.getElementById('tab-'+t).classList.toggle('active', t === tab);
   });
   document.getElementById('total-bar').classList.toggle('hidden', tab !== 'venda');
   if (tab === 'encomendas') loadEncomendas();
+  if (tab === 'reservas')   loadReservas();
 }
 
 // ── VENDA LOGIC ─────────────────────────────────────────
@@ -997,10 +1136,35 @@ function limparTudo() {
   document.getElementById('cliente').value = '';
   document.getElementById('obs').value = '';
   document.getElementById('empresa-outro').value = '';
+  // reset reserva
+  document.getElementById('is-reserva').value = '0';
+  document.getElementById('btn-reserva').classList.remove('selected');
+  document.getElementById('btn-reserva').textContent = '📄 Registrar como Reserva';
+  document.getElementById('modo-indicator').className = 'venda-mode-indicator modo-venda';
+  document.getElementById('modo-indicator').textContent = '✅ Modo: Venda Normal';
   selectPayment('Pago');
   selectEmpresa('Outro');
   updateTotal();
   showToast('Formulário limpo ✓');
+}
+
+function toggleReserva() {
+  const isRes = document.getElementById('is-reserva').value === '1';
+  const newVal = isRes ? '0' : '1';
+  document.getElementById('is-reserva').value = newVal;
+  const btn = document.getElementById('btn-reserva');
+  const ind = document.getElementById('modo-indicator');
+  if (newVal === '1') {
+    btn.classList.add('selected');
+    btn.textContent = '📄 Modo Reserva ATIVO';
+    ind.className = 'venda-mode-indicator modo-reserva';
+    ind.textContent = '📄 Modo: Reserva (não vai para Vendas)';
+  } else {
+    btn.classList.remove('selected');
+    btn.textContent = '📄 Registrar como Reserva';
+    ind.className = 'venda-mode-indicator modo-venda';
+    ind.textContent = '✅ Modo: Venda Normal';
+  }
 }
 
 function registrarVenda() {
@@ -1024,12 +1188,32 @@ function registrarVenda() {
     if (qtys[k] > 0) { itensList.push(qtys[k]+'x '+PRODUCTS[k].name); total += qtys[k]*PRODUCTS[k].price; }
   }
   if (!itensList.length) { showToast('⚠️ Adicione pelo menos 1 produto'); return; }
-  const payload = { data, cliente, empresa, itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs };
-  for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
-  showToast('Enviando...');
-  fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-    .then(() => { showToast('✓ Venda registrada!'); limparTudo(); })
-    .catch(() => showToast('⚠️ Erro ao enviar.'));
+
+  const isReserva = document.getElementById('is-reserva').value === '1';
+
+  if (isReserva) {
+    // Salva na aba Reservas
+    const payload = {
+      tipo: 'reserva',
+      data, cliente, empresa,
+      itens: itensList.join(', '),
+      total: total.toFixed(2),
+      pagamento, obs
+    };
+    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    showToast('Salvando reserva...');
+    fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
+      .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); })
+      .catch(() => showToast('⚠️ Erro ao enviar.'));
+  } else {
+    // Salva na aba Vendas (comportamento padrão)
+    const payload = { data, cliente, empresa, itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs };
+    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    showToast('Enviando...');
+    fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
+      .then(() => { showToast('✓ Venda registrada!'); limparTudo(); })
+      .catch(() => showToast('⚠️ Erro ao enviar.'));
+  }
 }
 
 // ── CONSULTA LOGIC ──────────────────────────────────────
@@ -1351,13 +1535,14 @@ function encCard(enc) {
 
   // Action buttons
   let actions = '';
-  if (entregue) {
-    actions += `<button class="enc-action-btn del-btn" onclick="arquivarEncomenda('${enc.id}')">🗑️ Apagar</button>`;
-  } else {
+  if (!entregue) {
     if (!pronto) {
       actions += `<button class="enc-action-btn pronto-btn" onclick="updateEncStatus('${enc.id}','pronto')">✅ Marcar Pronto</button>`;
     }
     actions += `<button class="enc-action-btn entregue-btn" onclick="updateEncStatus('${enc.id}','entregue')">📦 Entregue</button>`;
+  }
+  if (pronto || entregue) {
+    actions += `<button class="enc-action-btn arquivar-btn" onclick="arquivarEncomenda('${enc.id}')">📋 Arquivar → Vendas</button>`;
   }
 
   const empresa = enc.empresa ? `<span style="color:var(--brown-light);"> · ${enc.empresa}</span>` : '';
@@ -1444,18 +1629,185 @@ function updateEncStatus(id, novoStatus) {
   .catch(() => showToast('⚠️ Erro ao atualizar.'));
 }
 
+// ── ARQUIVAR ENCOMENDA → VENDAS ──────────────────────────
 function arquivarEncomenda(id) {
-  if (!confirm('Apagar esta encomenda e lançar como venda?')) return;
-  showToast('Lançando na venda...');
+  const enc = encAll.find(e => e.id === id);
+  if (!enc) { showToast('⚠️ Encomenda não encontrada'); return; }
+
+  showToast('Arquivando em Vendas...');
+
+  // today as yyyy-MM-dd for the spreadsheet
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+
+  const payload = {
+    tipo: 'arquivar_encomenda',
+    enc_id: id,
+    // venda row data
+    data:       enc.dataEntrega || dataHoje,
+    cliente:    enc.cliente,
+    empresa:    '',
+    itens:      enc.descricao,
+    total:      enc.valor,
+    pagamento:  enc.status === 'entregue' ? 'Pago' : 'Pendente',
+    obs:        enc.descricao
+  };
+
   fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ tipo: 'archive_encomenda', id })
+    body: JSON.stringify(payload)
   })
   .then(() => {
-    showToast('✓ Encomenda lançada na venda e apagada!');
+    showToast('✓ Arquivado em Vendas e removido!');
+    // remove from cache and re-render
     encAll = encAll.filter(e => e.id !== id);
     renderEncCards(encAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao arquivar.'));
+}
+
+// ── encCard: show arquivar for pronto/entregue ────────────
+// (already wired in encCard via arquivarEncomenda)
+
+// ── RESERVAS ─────────────────────────────────────────────
+let resFilter = 'todos';
+let resAll    = [];
+
+function setResFilter(f) {
+  resFilter = f;
+  ['todos','reserva','vendida'].forEach(k => {
+    document.getElementById('rf-'+k).classList.toggle('active', k === f);
+  });
+  renderResCards(resAll);
+}
+
+function loadReservas() {
+  document.getElementById('res-list').innerHTML =
+    '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
+  fetch(`${SCRIPT_URL}?action=reservas`)
+    .then(r => r.json())
+    .then(data => {
+      resAll = Array.isArray(data.reservas) ? data.reservas : [];
+      renderResCards(resAll);
+    })
+    .catch(() => {
+      document.getElementById('res-list').innerHTML =
+        '<div class="res-empty">⚠️ Erro ao carregar. Verifique a conexão.</div>';
+    });
+}
+
+function renderResCards(list) {
+  const filtered = resFilter === 'todos'
+    ? list
+    : list.filter(r => (r.status||'reserva') === resFilter);
+
+  const sorted = [...filtered].sort((a,b) => {
+    return new Date(b.data||0) - new Date(a.data||0);
+  });
+
+  // Stats (full list)
+  const reservadas = list.filter(r => (r.status||'reserva') === 'reserva');
+  const vendidas   = list.filter(r => (r.status||'') === 'vendida');
+  const totalVal   = reservadas.reduce((s,r) => s + (parseFloat(r.total)||0), 0);
+  document.getElementById('res-stat-total').textContent    = list.length;
+  document.getElementById('res-stat-valor').textContent    = 'R$ '+totalVal.toFixed(0);
+  document.getElementById('res-stat-vendidas').textContent = vendidas.length;
+
+  if (sorted.length === 0) {
+    document.getElementById('res-list').innerHTML = `
+      <div class="res-empty">
+        <div class="enc-empty-icon">📄</div>
+        ${resFilter === 'todos' ? 'Nenhuma reserva ainda.<br>Use o botão 📄 na tela de Venda.' : 'Nenhuma reserva nesta categoria.'}
+      </div>`;
+    return;
+  }
+
+  document.getElementById('res-list').innerHTML = sorted.map(r => resCard(r)).join('');
+}
+
+function resCard(r) {
+  const status  = r.status || 'reserva';
+  const vendida = status === 'vendida';
+  const empresa = r.empresa ? ` · <span style="color:var(--brown-light)">${r.empresa}</span>` : '';
+
+  let actions = '';
+  if (!vendida) {
+    actions = `
+      <div class="res-actions">
+        <button class="res-action-btn vender-btn"  onclick="venderReserva('${r.id}')">✅ Confirmar Venda</button>
+        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+      </div>`;
+  } else {
+    actions = `
+      <div class="res-actions">
+        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+      </div>`;
+  }
+
+  return `
+  <div class="res-card" id="rescard-${r.id}">
+    <div class="res-card-top">
+      <div class="res-strip"></div>
+      <div class="res-card-main">
+        <div class="res-card-head">
+          <div class="res-card-cliente">${r.cliente||'—'}${empresa}</div>
+          <span class="res-badge">${vendida ? '✅ Vendida' : '📄 Reserva'}</span>
+        </div>
+        ${r.itens ? `<div class="res-itens">${r.itens}</div>` : ''}
+        <div class="res-card-footer">
+          <span class="res-date">${fmtDate(r.data)}</span>
+          <span class="res-total">${fmt(r.total)}</span>
+        </div>
+      </div>
+    </div>
+    ${actions}
+  </div>`;
+}
+
+function venderReserva(id) {
+  const res = resAll.find(r => r.id === id);
+  if (!res) return;
+  showToast('Confirmando venda...');
+
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      tipo: 'vender_reserva',
+      res_id: id,
+      data:      dataHoje,
+      cliente:   res.cliente,
+      empresa:   res.empresa || '',
+      itens:     res.itens,
+      total:     res.total,
+      pagamento: 'Pago',
+      obs:       res.obs || ''
+    })
+  })
+  .then(() => {
+    showToast('✓ Venda confirmada e registrada!');
+    const r = resAll.find(x => x.id === id);
+    if (r) r.status = 'vendida';
+    renderResCards(resAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao confirmar.'));
+}
+
+function apagarReserva(id) {
+  showToast('Apagando reserva...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'apagar_reserva', res_id: id })
+  })
+  .then(() => {
+    showToast('✓ Reserva apagada!');
+    resAll = resAll.filter(r => r.id !== id);
+    renderResCards(resAll);
   })
   .catch(() => showToast('⚠️ Erro ao apagar.'));
 }
