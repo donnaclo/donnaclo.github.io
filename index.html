@@ -2057,6 +2057,15 @@ function salvarEstoque() {
   .catch(() => showToast('⚠️ Erro ao salvar estoque.'));
 }
 
+// Save estoque without toast (used automatically after vendas/reservas)
+function salvarEstoqueSilencioso() {
+  return fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'salvar_estoque', estoque: estoqueCache })
+  }).catch(() => {});
+}
+
 // Deduct sold/reserved items from local estoque cache
 function deductFromEstoque(qtysObj) {
   for (const key in qtysObj) {
@@ -2065,6 +2074,7 @@ function deductFromEstoque(qtysObj) {
     }
   }
   renderStockBadgesOnVenda();
+  salvarEstoqueSilencioso();
 }
 
 // Show stock badges next to product names on the venda page
