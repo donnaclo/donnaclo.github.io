@@ -721,6 +721,101 @@
   /* ── ARCHIVE / DELETE btn on entregue cards ──────────── */
   .enc-action-btn.arquivar-btn { border-color: var(--brown-light); color: var(--brown-mid); background: #F6ECDE; }
 
+  /* ── ESTOQUE PAGE ────────────────────────────────────── */
+  #page-estoque { padding-bottom: 40px; }
+
+  .estoque-summary {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .estoque-summary .enc-stat-val { font-size: 20px; }
+
+  .est-save-bar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--cream); padding: 10px 0 6px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .btn-est-save {
+    flex: 1; padding: 11px;
+    background: var(--brown-light); color: white; border: none;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .btn-est-save:active { background: var(--brown-mid); }
+  .btn-est-reload {
+    padding: 11px 14px;
+    background: var(--warm-white); border: 1px solid var(--border); color: var(--gray-soft);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+
+  .est-product-row {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 11px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; gap: 10px; width: 100%;
+    transition: border-color 0.15s;
+  }
+  .est-product-row.low    { border-color: #D97B20; background: #FFFAF4; }
+  .est-product-row.out    { border-color: var(--red-warn); background: #FFF5F5; }
+  .est-product-row.plenty { border-color: var(--green-ok); background: #F3FBF6; }
+
+  .est-info { flex: 1; min-width: 0; }
+  .est-name { font-size: 14px; font-weight: 500; color: var(--brown-dark);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .est-price { font-size: 11px; color: var(--gray-soft); margin-top: 1px; }
+  .est-stock-indicator {
+    font-size: 10px; font-weight: 500; padding: 2px 8px;
+    border-radius: 20px; margin-top: 3px; display: inline-block;
+  }
+  .est-stock-indicator.out    { background: #FCECEA; color: var(--red-warn); }
+  .est-stock-indicator.low    { background: #FEF3E2; color: #B85C00; }
+  .est-stock-indicator.plenty { background: #EBF6EF; color: var(--green-ok); }
+
+  .est-qty-wrap { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .est-input {
+    width: 54px; text-align: center;
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 4px;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500;
+    color: var(--brown-dark); outline: none;
+    -webkit-appearance: none; -moz-appearance: textfield;
+  }
+  .est-input::-webkit-outer-spin-button,
+  .est-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .est-input:focus { border-color: var(--brown-light); }
+
+  .est-qbtn {
+    width: 36px; height: 36px; border: 1px solid var(--border);
+    background: var(--cream); border-radius: 8px; font-size: 18px;
+    color: var(--brown-mid); cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    transition: background 0.1s; flex-shrink: 0;
+  }
+  .est-qbtn:active { background: rgba(122,62,16,0.12); }
+
+  /* Aviso de estoque na tela de venda */
+  .stock-warning {
+    display: none; background: #FCECEA; border: 1px solid var(--red-warn);
+    border-radius: 8px; padding: 8px 12px; margin-top: 6px;
+    font-size: 12px; color: var(--red-warn); font-weight: 500;
+  }
+  .stock-warning.show { display: block; }
+
+  /* Badge de estoque nos product-rows da venda */
+  .stock-badge {
+    font-size: 10px; font-weight: 500; padding: 1px 7px;
+    border-radius: 20px; flex-shrink: 0; margin-left: 4px;
+  }
+  .stock-badge.out  { background: #FCECEA; color: var(--red-warn); }
+  .stock-badge.low  { background: #FEF3E2; color: #B85C00; }
+  .stock-badge.ok   { background: #EBF6EF; color: var(--green-ok); }
+
 </style>
 </head>
 <body>
@@ -740,6 +835,9 @@
     </button>
     <button class="tab-btn" id="tab-reservas"   onclick="switchTab('reservas')">
       <span class="tab-emoji">📄</span><span class="tab-label">Reservas</span>
+    </button>
+    <button class="tab-btn" id="tab-estoque"    onclick="switchTab('estoque')">
+      <span class="tab-emoji">📊</span><span class="tab-label">Estoque</span>
     </button>
   </div>
 </header>
@@ -1027,6 +1125,44 @@
 </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: ESTOQUE
+════════════════════════════════════════════════════════ -->
+<div id="page-estoque" class="page">
+<div class="container">
+
+  <p class="section-label" style="margin-top:4px;">Controle de Estoque</p>
+
+  <!-- Summary strip -->
+  <div class="estoque-summary">
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:var(--green-ok)" id="est-stat-ok">0</div>
+      <div class="enc-stat-lbl">Com estoque</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:#D97B20" id="est-stat-low">0</div>
+      <div class="enc-stat-lbl">Baixo (≤2)</div>
+    </div>
+    <div class="enc-stat">
+      <div class="enc-stat-val" style="color:var(--red-warn)" id="est-stat-out">0</div>
+      <div class="enc-stat-lbl">Zerado</div>
+    </div>
+  </div>
+
+  <!-- Save bar -->
+  <div class="est-save-bar">
+    <button class="btn-est-save" onclick="salvarEstoque()">💾 Salvar Estoque</button>
+    <button class="btn-est-reload" onclick="loadEstoque()">↺</button>
+  </div>
+
+  <!-- Product list -->
+  <div id="est-list">
+    <div class="enc-loading"><div class="spinner"></div>Carregando estoque...</div>
+  </div>
+
+</div>
+</div>
+
 <!-- TOTAL BAR (venda only) -->
 <div class="total-bar" id="total-bar">
   <div style="min-width:0;flex:1;overflow:hidden;">
@@ -1039,7 +1175,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwArgS-a6-eq-RScCFE8rgDVJCTAxgcnYHCocmBIddy2mg9a1bD9diBrUiZaV-pTjmV/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJDKJqjugSlCB79KV3dMyiBZuW6G8HFVu0nB-J8uem15jEFMnS93H1yp2ZEl1POC1U/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1080,17 +1216,27 @@ window.onload = () => {
     `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
   selectEmpresa('Outro');
   loadClientes();
+  // Pre-load estoque silently → shows badges on venda tab immediately
+  fetch(`${SCRIPT_URL}?action=estoque`)
+    .then(r => r.json())
+    .then(data => {
+      estoqueCache = data.estoque || {};
+      estoqueLoaded = true;
+      renderStockBadgesOnVenda();
+    })
+    .catch(() => { estoqueLoaded = true; });
 };
 
 // ── TABS ────────────────────────────────────────────────
 function switchTab(tab) {
-  ['venda','consulta','encomendas','reservas'].forEach(t => {
+  ['venda','consulta','encomendas','reservas','estoque'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('active', t === tab);
     document.getElementById('tab-'+t).classList.toggle('active', t === tab);
   });
   document.getElementById('total-bar').classList.toggle('hidden', tab !== 'venda');
   if (tab === 'encomendas') loadEncomendas();
   if (tab === 'reservas')   loadReservas();
+  if (tab === 'estoque')    loadEstoque();
 }
 
 // ── VENDA LOGIC ─────────────────────────────────────────
@@ -1190,31 +1336,23 @@ function registrarVenda() {
   const isReserva = document.getElementById('is-reserva').value === '1';
 
   if (isReserva) {
-  const payload = {
-    tipo: 'reserva',
-    data, cliente, empresa,
-    itens: itensList.join(', '),
-    total: total.toFixed(2),
-    obs
-  };
-  for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
-
-  showToast('Salvando reserva...');
-  fetch(SCRIPT_URL, {
-    method:'POST',
-    mode:'no-cors',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  })
-  .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); })
-  .catch(() => showToast('⚠️ Erro ao enviar.'));
-} else {
-    // Salva na aba Vendas (comportamento padrão)
+    const payload = {
+      tipo: 'reserva', data, cliente, empresa,
+      itens: itensList.join(', '), total: total.toFixed(2), obs
+    };
+    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    if (!checkStockBeforeSubmit(qtys)) return;
+    showToast('Salvando reserva...');
+    fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
+      .then(() => { showToast('📄 Reserva registrada!'); deductFromEstoque({...qtys}); limparTudo(); })
+      .catch(() => showToast('⚠️ Erro ao enviar.'));
+  } else {
     const payload = { data, cliente, empresa, itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs };
     for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    if (!checkStockBeforeSubmit(qtys)) return;
     showToast('Enviando...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('✓ Venda registrada!'); limparTudo(); })
+      .then(() => { showToast('✓ Venda registrada!'); deductFromEstoque({...qtys}); limparTudo(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   }
 }
@@ -1813,6 +1951,157 @@ function apagarReserva(id) {
     renderResCards(resAll);
   })
   .catch(() => showToast('⚠️ Erro ao apagar.'));
+}
+
+// ── ESTOQUE ──────────────────────────────────────────────
+// Local cache: { product_key: qty }
+let estoqueCache = {};
+let estoqueLoaded = false;
+
+function loadEstoque() {
+  document.getElementById('est-list').innerHTML =
+    '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
+  fetch(`${SCRIPT_URL}?action=estoque`)
+    .then(r => r.json())
+    .then(data => {
+      estoqueCache = data.estoque || {};
+      estoqueLoaded = true;
+      renderEstoque();
+      renderStockBadgesOnVenda();
+    })
+    .catch(() => {
+      // If server has no estoque yet, start with zeros
+      estoqueCache = {};
+      estoqueLoaded = true;
+      renderEstoque();
+    });
+}
+
+function renderEstoque() {
+  let ok = 0, low = 0, out = 0;
+  let html = '';
+
+  for (const key in PRODUCTS) {
+    const p   = PRODUCTS[key];
+    const qty = estoqueCache[key] !== undefined ? estoqueCache[key] : 0;
+
+    let rowClass = '';
+    let badgeClass = '';
+    let badgeLabel = '';
+    if (qty === 0)     { out++;  rowClass = 'out';    badgeClass = 'out';    badgeLabel = '⛔ Zerado'; }
+    else if (qty <= 2) { low++;  rowClass = 'low';    badgeClass = 'low';    badgeLabel = '⚠️ Baixo'; }
+    else               { ok++;   rowClass = 'plenty'; badgeClass = 'plenty'; badgeLabel = `✓ ${qty} un.`; }
+
+    html += `
+    <div class="est-product-row ${rowClass}" id="erow-${key}">
+      <div class="est-info">
+        <div class="est-name">${p.name}</div>
+        <div class="est-price">R$ ${p.price},00</div>
+        <span class="est-stock-indicator ${badgeClass}">${badgeLabel}</span>
+      </div>
+      <div class="est-qty-wrap">
+        <button class="est-qbtn" onclick="adjustEst('${key}',-1)">−</button>
+        <input class="est-input" type="number" id="est-qty-${key}"
+               value="${qty}" min="0" max="999"
+               onchange="onEstChange('${key}',this.value)">
+        <button class="est-qbtn" onclick="adjustEst('${key}',1)">+</button>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('est-list').innerHTML = html;
+  document.getElementById('est-stat-ok').textContent  = ok;
+  document.getElementById('est-stat-low').textContent = low;
+  document.getElementById('est-stat-out').textContent = out;
+}
+
+function adjustEst(key, delta) {
+  const input = document.getElementById('est-qty-'+key);
+  const newVal = Math.max(0, (parseInt(input.value)||0) + delta);
+  input.value = newVal;
+  onEstChange(key, newVal);
+}
+
+function onEstChange(key, val) {
+  estoqueCache[key] = Math.max(0, parseInt(val)||0);
+  // Update row class live
+  const qty = estoqueCache[key];
+  const row = document.getElementById('erow-'+key);
+  row.classList.remove('out','low','plenty');
+  const badge = row.querySelector('.est-stock-indicator');
+  badge.classList.remove('out','low','plenty');
+  if (qty === 0)     { row.classList.add('out');    badge.classList.add('out');    badge.textContent = '⛔ Zerado'; }
+  else if (qty <= 2) { row.classList.add('low');    badge.classList.add('low');    badge.textContent = '⚠️ Baixo'; }
+  else               { row.classList.add('plenty'); badge.classList.add('plenty'); badge.textContent = `✓ ${qty} un.`; }
+  // Update summary
+  let ok=0,low=0,out=0;
+  for (const k in PRODUCTS) {
+    const q = estoqueCache[k]||0;
+    if (q===0) out++; else if (q<=2) low++; else ok++;
+  }
+  document.getElementById('est-stat-ok').textContent  = ok;
+  document.getElementById('est-stat-low').textContent = low;
+  document.getElementById('est-stat-out').textContent = out;
+  // Live update badges on venda tab
+  renderStockBadgesOnVenda();
+}
+
+function salvarEstoque() {
+  showToast('Salvando estoque...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'salvar_estoque', estoque: estoqueCache })
+  })
+  .then(() => showToast('✓ Estoque salvo!'))
+  .catch(() => showToast('⚠️ Erro ao salvar estoque.'));
+}
+
+// Deduct sold/reserved items from local estoque cache
+function deductFromEstoque(qtysObj) {
+  for (const key in qtysObj) {
+    if (qtysObj[key] > 0 && estoqueCache[key] !== undefined) {
+      estoqueCache[key] = Math.max(0, (estoqueCache[key]||0) - qtysObj[key]);
+    }
+  }
+  renderStockBadgesOnVenda();
+}
+
+// Show stock badges next to product names on the venda page
+function renderStockBadgesOnVenda() {
+  if (!estoqueLoaded) return;
+  for (const key in PRODUCTS) {
+    const nameEl = document.querySelector(`#row-${key} .product-name`);
+    if (!nameEl) continue;
+    // Remove old badge
+    const old = nameEl.querySelector('.stock-badge');
+    if (old) old.remove();
+    const qty = estoqueCache[key] !== undefined ? estoqueCache[key] : null;
+    if (qty === null) continue;
+    const badge = document.createElement('span');
+    badge.className = 'stock-badge ' + (qty === 0 ? 'out' : qty <= 2 ? 'low' : 'ok');
+    badge.textContent = qty === 0 ? '⛔ 0' : qty <= 2 ? `⚠️ ${qty}` : `${qty}`;
+    nameEl.appendChild(badge);
+  }
+}
+
+// Validate stock before registering
+function checkStockBeforeSubmit(qtysObj) {
+  if (!estoqueLoaded) return true; // skip if not loaded
+  const problems = [];
+  for (const key in qtysObj) {
+    if (qtysObj[key] > 0) {
+      const avail = estoqueCache[key] !== undefined ? estoqueCache[key] : 999;
+      if (qtysObj[key] > avail) {
+        problems.push(`${PRODUCTS[key].name}: pedido ${qtysObj[key]}, estoque ${avail}`);
+      }
+    }
+  }
+  if (problems.length > 0) {
+    showToast('⚠️ Estoque insuficiente: ' + problems[0]);
+    return false;
+  }
+  return true;
 }
 
 // ── TOAST ───────────────────────────────────────────────
