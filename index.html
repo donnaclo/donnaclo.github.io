@@ -344,6 +344,23 @@
   }
   .badge-pago     { background: #EBF6EF; color: var(--green-ok); }
   .badge-pendente { background: #FCECEA; color: var(--red-warn); }
+  .hist-pay-btn {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--green-ok);
+    background: #EBF6EF;
+    color: var(--green-ok);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hist-pay-btn:active { transform: scale(0.98); }
+  .enc-action-btn.entregue-pago { border-color: var(--green-ok); color: var(--green-ok); background: #EBF6EF; }
+  .enc-action-btn.entregue-pendente { border-color: #D97B20; color: #B85C00; background: #FEF3E2; }
 
   .empty-state {
     text-align: center; padding: 36px 20px;
@@ -1175,7 +1192,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJDKJqjugSlCB79KV3dMyiBZuW6G8HFVu0nB-J8uem15jEFMnS93H1yp2ZEl1POC1U/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbze0Cx8X93yqBHUk3saeOcZdpu-3DfMtaQcsjSxjXM2KCTIbM_S4mmhfIyk5hvaTP2S/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1206,6 +1223,8 @@ const PRODUCTS = {
 };
 const qtys = {};
 for (const k in PRODUCTS) qtys[k] = 0;
+
+let consultaAtual = null;
 
 let allClientes = [];
 
@@ -1500,18 +1519,23 @@ function executarBuscaCliente(nome) {
     });
 }
 
-function histItem(r) {
+
+function histItem(r, showPayBtn = false) {
   const isPend = (r.pagamento||'').toLowerCase() === 'pendente';
   const badge  = isPend
     ? '<span class="badge badge-pendente">Pendente</span>'
     : '<span class="badge badge-pago">Pago</span>';
   const empresa = r.empresa ? `<div class="hist-empresa">${r.empresa}</div>` : '';
+  const payBtn = (showPayBtn && isPend)
+    ? `<button class="hist-pay-btn" onclick="marcarVendaComoPago(${r.rowIndex})">Pago</button>`
+    : '';
   return `
   <div class="history-item">
     <div class="hist-date">${fmtDate(r.data)}</div>
     <div class="hist-body">
       <div class="hist-itens" title="${r.itens||''}">${r.itens || '—'}</div>
       ${empresa}
+      ${payBtn}
     </div>
     <div class="hist-right">
       <div class="hist-total">${fmt(r.total)}</div>
@@ -1520,7 +1544,10 @@ function histItem(r) {
   </div>`;
 }
 
+
 function renderConsulta(data) {
+  consultaAtual = data;
+
   const { registros, totalGeral, totalPago, totalPendente } = data;
 
   document.getElementById('kpi-total').textContent    = fmt(totalGeral);
@@ -1542,7 +1569,7 @@ function renderConsulta(data) {
   if (pendentes.length > 0) {
     secPend.style.display = '';
     document.getElementById('badge-pendentes').textContent = pendentes.length;
-    document.getElementById('list-pendentes').innerHTML = pendentes.map(r => histItem(r)).join('');
+    document.getElementById('list-pendentes').innerHTML = pendentes.map(r => histItem(r, true)).join('');
   } else {
     secPend.style.display = 'none';
   }
@@ -1553,12 +1580,28 @@ function renderConsulta(data) {
     document.getElementById('list-historico').innerHTML =
       '<div class="empty-state"><div class="empty-icon">😕</div>Nenhuma compra encontrada para este nome.</div>';
   } else {
-    document.getElementById('list-historico').innerHTML = sorted.map(r => histItem(r)).join('');
+    document.getElementById('list-historico').innerHTML = sorted.map(r => histItem(r, false)).join('');
   }
 }
-// ── ENCOMENDAS ──────────────────────────────────────────
-let encFilter = 'todos';
-let encAll = []; // cache
+
+function marcarVendaComoPago(rowIndex) {
+  if (!rowIndex) { showToast('⚠️ Não foi possível identificar a venda'); return; }
+  showToast('Marcando como pago...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'atualizar_pagamento_venda', rowIndex: rowIndex, pagamento: 'Pago' })
+  })
+  .then(() => {
+    if (consultaAtual && Array.isArray(consultaAtual.registros)) {
+      const reg = consultaAtual.registros.find(r => r.rowIndex === rowIndex);
+      if (reg) reg.pagamento = 'Pago';
+      renderConsulta(consultaAtual);
+    }
+    showToast('✓ Venda marcada como paga!');
+  })
+  .catch(() => showToast('⚠️ Erro ao atualizar.'));
+}
 
 function toggleEncForm() {
   const body  = document.getElementById('enc-form-body');
@@ -1643,23 +1686,24 @@ function diasRestantes(dataEntregaStr) {
   return Math.round((entrega - hoje) / 86400000);
 }
 
+
 function encCard(enc) {
-  const status   = (enc.status || 'pendente').toLowerCase();
-  const entregue = status === 'entregue';
-  const pronto   = status === 'pronto';
+  const status = (enc.status || 'pendente').toLowerCase();
+  const isEntregue = status.startsWith('entregue');
+  const entregaPago = status === 'entregue_pago';
+  const entregaPend = status === 'entregue_pendente';
+  const pronto = status === 'pronto';
 
-  const dias = entregue ? null : diasRestantes(enc.dataEntrega);
+  const dias = isEntregue ? null : diasRestantes(enc.dataEntrega);
 
-  // Strip colour
   let stripClass = 'ok';
-  if (entregue) stripClass = 'entregue';
+  if (isEntregue) stripClass = 'entregue';
   else if (dias !== null && dias < 0)  stripClass = 'urgente';
-  else if (dias !== null && dias <= 2) stripClass = 'urgente';
-  else if (dias !== null && dias <= 5) stripClass = 'proximo';
+  else if (dias !== null && dias <= 2)  stripClass = 'urgente';
+  else if (dias !== null && dias <= 5)  stripClass = 'proximo';
 
-  // Dias pill
   let diasHtml = '';
-  if (!entregue && dias !== null) {
+  if (!isEntregue && dias !== null) {
     let diasClass = '';
     let diasLabel = '';
     if (dias < 0)      { diasClass = 'urgente'; diasLabel = `${Math.abs(dias)}d atrasada`; }
@@ -1670,19 +1714,23 @@ function encCard(enc) {
     diasHtml = `<span class="enc-dias ${diasClass}">${diasLabel}</span>`;
   }
 
-  // Status badge
-  const badgeClass = status === 'pendente' ? 'pendente' : status === 'pronto' ? 'pronto' : 'entregue';
-  const badgeLabel = status === 'pendente' ? '⏳ Pendente' : status === 'pronto' ? '✅ Pronto' : '📦 Entregue';
+  let badgeClass = 'pendente';
+  let badgeLabel = '⏳ Pendente';
+  if (pronto) { badgeClass = 'pronto'; badgeLabel = '✅ Pronto'; }
+  if (entregaPago) { badgeClass = 'entregue'; badgeLabel = '📦 Entregue · Pago'; }
+  if (entregaPend) { badgeClass = 'entregue'; badgeLabel = '📦 Entregue · Pendente'; }
+  if (isEntregue && !entregaPago && !entregaPend) { badgeClass = 'entregue'; badgeLabel = '📦 Entregue'; }
 
-  // Action buttons
   let actions = '';
-  if (!entregue) {
+  if (!isEntregue) {
     if (!pronto) {
       actions += `<button class="enc-action-btn pronto-btn" onclick="updateEncStatus('${enc.id}','pronto')">✅ Marcar Pronto</button>`;
+    } else {
+      actions += `<button class="enc-action-btn entregue-pago" onclick="updateEncStatus('${enc.id}','entregue_pago')">✅ Entregue Pago</button>`;
+      actions += `<button class="enc-action-btn entregue-pendente" onclick="updateEncStatus('${enc.id}','entregue_pendente')">⏳ Entregue Pendente</button>`;
     }
-    actions += `<button class="enc-action-btn entregue-btn" onclick="updateEncStatus('${enc.id}','entregue')">📦 Entregue</button>`;
   }
-  if (pronto || entregue) {
+  if (isEntregue) {
     actions += `<button class="enc-action-btn arquivar-btn" onclick="arquivarEncomenda('${enc.id}')">📋 Arquivar → Vendas</button>`;
   }
 
@@ -1711,6 +1759,64 @@ function encCard(enc) {
     </div>
     ${actions ? `<div class="enc-card-actions">${actions}</div>` : ''}
   </div>`;
+}
+
+function updateEncStatus(id, novoStatus) {
+  const labels = {
+    pronto: 'Pronto',
+    entregue_pago: 'Entregue Pago',
+    entregue_pendente: 'Entregue Pendente'
+  };
+  showToast(`Atualizando para ${labels[novoStatus] || novoStatus}...`);
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'update_encomenda', id, status: novoStatus })
+  })
+  .then(() => {
+    showToast('✓ Status atualizado!');
+    const enc = encAll.find(e => e.id === id);
+    if (enc) enc.status = novoStatus;
+    renderEncCards(encAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao atualizar.'));
+}
+
+function arquivarEncomenda(id) {
+  const enc = encAll.find(e => e.id === id);
+  if (!enc) { showToast('⚠️ Encomenda não encontrada'); return; }
+
+  showToast('Arquivando em Vendas...');
+
+  const status = (enc.status || '').toLowerCase();
+  const pagamento = status === 'entregue_pendente' ? 'Pendente' : 'Pago';
+
+  const hoje = new Date();
+  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
+
+  const payload = {
+    tipo: 'arquivar_encomenda',
+    enc_id: id,
+    data:       enc.dataEntrega || dataHoje,
+    cliente:    enc.cliente,
+    empresa:    '',
+    itens:      enc.descricao,
+    total:      enc.valor,
+    pagamento:  pagamento,
+    obs:        enc.descricao
+  };
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    showToast('✓ Arquivado em Vendas e removido!');
+    encAll = encAll.filter(e => e.id !== id);
+    renderEncCards(encAll);
+  })
+  .catch(() => showToast('⚠️ Erro ao arquivar.'));
 }
 
 function salvarEncomenda() {
@@ -1823,6 +1929,7 @@ function setResFilter(f) {
   renderResCards(resAll);
 }
 
+
 function loadReservas() {
   document.getElementById('res-list').innerHTML =
     '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
@@ -1847,7 +1954,6 @@ function renderResCards(list) {
     return new Date(b.data||0) - new Date(a.data||0);
   });
 
-  // Stats (full list)
   const reservadas = list.filter(r => (r.status||'reserva') === 'reserva');
   const vendidas   = list.filter(r => (r.status||'') === 'vendida');
   const totalVal   = reservadas.reduce((s,r) => s + (parseFloat(r.total)||0), 0);
@@ -1873,19 +1979,19 @@ function resCard(r) {
   const empresa = r.empresa ? ` · <span style="color:var(--brown-light)">${r.empresa}</span>` : '';
 
   let actions = '';
-if (!vendida) {
-  actions = `
-    <div class="res-actions">
-      <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pago')">✅ Retirou: Pago</button>
-      <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pendente')">⏳ Retirou: Pendente</button>
-      <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
-    </div>`;
-} else {
-  actions = `
-    <div class="res-actions">
-      <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
-    </div>`;
-}
+  if (!vendida) {
+    actions = `
+      <div class="res-actions">
+        <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pago')">✅ Retirou: Pago</button>
+        <button class="res-action-btn vender-btn" onclick="retirarReserva('${r.id}','Pendente')">⏳ Retirou: Pendente</button>
+        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+      </div>`;
+  } else {
+    actions = `
+      <div class="res-actions">
+        <button class="res-action-btn del-res-btn" onclick="apagarReserva('${r.id}')">🗑 Apagar</button>
+      </div>`;
+  }
 
   return `
   <div class="res-card" id="rescard-${r.id}">
@@ -1939,6 +2045,13 @@ function retirarReserva(id, pagamento) {
 }
 
 function apagarReserva(id) {
+  const res = resAll.find(r => r.id === id);
+  if (!res) { showToast('⚠️ Reserva não encontrada'); return; }
+
+  if ((res.status || 'reserva').toLowerCase() !== 'vendida') {
+    restoreToEstoque(extractQtysFromReserva(res));
+  }
+
   showToast('Apagando reserva...');
   fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
@@ -1970,10 +2083,10 @@ function loadEstoque() {
       renderStockBadgesOnVenda();
     })
     .catch(() => {
-      // If server has no estoque yet, start with zeros
       estoqueCache = {};
       estoqueLoaded = true;
       renderEstoque();
+      renderStockBadgesOnVenda();
     });
 }
 
@@ -2024,7 +2137,6 @@ function adjustEst(key, delta) {
 
 function onEstChange(key, val) {
   estoqueCache[key] = Math.max(0, parseInt(val)||0);
-  // Update row class live
   const qty = estoqueCache[key];
   const row = document.getElementById('erow-'+key);
   row.classList.remove('out','low','plenty');
@@ -2033,7 +2145,6 @@ function onEstChange(key, val) {
   if (qty === 0)     { row.classList.add('out');    badge.classList.add('out');    badge.textContent = '⛔ Zerado'; }
   else if (qty <= 2) { row.classList.add('low');    badge.classList.add('low');    badge.textContent = '⚠️ Baixo'; }
   else               { row.classList.add('plenty'); badge.classList.add('plenty'); badge.textContent = `✓ ${qty} un.`; }
-  // Update summary
   let ok=0,low=0,out=0;
   for (const k in PRODUCTS) {
     const q = estoqueCache[k]||0;
@@ -2042,7 +2153,6 @@ function onEstChange(key, val) {
   document.getElementById('est-stat-ok').textContent  = ok;
   document.getElementById('est-stat-low').textContent = low;
   document.getElementById('est-stat-out').textContent = out;
-  // Live update badges on venda tab
   renderStockBadgesOnVenda();
 }
 
@@ -2057,7 +2167,6 @@ function salvarEstoque() {
   .catch(() => showToast('⚠️ Erro ao salvar estoque.'));
 }
 
-// Save estoque without toast (used automatically after vendas/reservas)
 function salvarEstoqueSilencioso() {
   return fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
@@ -2066,24 +2175,125 @@ function salvarEstoqueSilencioso() {
   }).catch(() => {});
 }
 
-// Deduct sold/reserved items from local estoque cache
 function deductFromEstoque(qtysObj) {
   for (const key in qtysObj) {
     if (qtysObj[key] > 0 && estoqueCache[key] !== undefined) {
       estoqueCache[key] = Math.max(0, (estoqueCache[key]||0) - qtysObj[key]);
     }
   }
-  renderStockBadgesOnVenda();
   salvarEstoqueSilencioso();
+  renderStockBadgesOnVenda();
 }
 
-// Show stock badges next to product names on the venda page
+const RESERVA_ALIASES = {
+  'alfajor': 'alfajor',
+  'pao de mel': 'pao_mel',
+  'pao mel': 'pao_mel',
+  'queijadinha': 'queijadinha',
+  'bombolacha': 'bombolacha',
+  'biscoito de amendoim': 'biscoito_amendoim',
+  'bb': 'bb',
+  'brigadeiro belga': 'bb',
+  'ln': 'ln',
+  'leite ninho': 'ln',
+  'beijinho': 'beij',
+  'bem casado': 'bem_casado',
+  'prestigio': 'prestigio',
+  'prestígio': 'prestigio',
+  'amendoim crocante': 'amendoim_crocante',
+  'dois amores': 'dois_amores',
+  'maracuja': 'maracuja',
+  'maracujá': 'maracuja',
+  'limao': 'limao',
+  'limão': 'limao',
+  'cenoura c brig belga': 'cenoura_bb',
+  'cenoura com brigadeiro belga': 'cenoura_bb',
+  'ln c geleia morango': 'ln_geleia',
+  'ln com geleia de morango': 'ln_geleia',
+  'morango pote': 'morango_pote',
+  'abacaxi c coco pote': 'abacaxi_coco',
+  'abacaxi com coco pote': 'abacaxi_coco',
+  'morangoffee': 'morangoffee',
+  'banoffee pote': 'banoffee_pote',
+  'bolo sem frutas': 'bolo_sem_fruta',
+  'bolo com frutas': 'bolo_com_fruta',
+  'torta de limao': 'torta_limao',
+  'torta de limão': 'torta_limao',
+  'torta banoffee': 'torta_banoffee',
+};
+
+function normalizeReservaText(str) {
+  return String(str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[()]/g, ' ')
+    .replace(/[.,;]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractQtysFromReserva(res) {
+  const out = {};
+  for (const key in PRODUCTS) out[key] = 0;
+
+  if (res && typeof res.qtys === 'object' && res.qtys !== null) {
+    for (const key in PRODUCTS) out[key] = parseInt(res.qtys[key]) || 0;
+    return out;
+  }
+
+  let hasFlatQty = false;
+  for (const key in PRODUCTS) {
+    const v = parseInt(res && res['qty_' + key]);
+    if (!isNaN(v) && v > 0) hasFlatQty = true;
+    out[key] = v || 0;
+  }
+  if (hasFlatQty) return out;
+
+  const itens = String(res && res.itens ? res.itens : '');
+  if (!itens) return out;
+
+  const parts = itens.split(',');
+  for (const part of parts) {
+    const m = part.match(/(\d+)\s*[x×]\s*(.+)/i);
+    if (!m) continue;
+
+    const qty = parseInt(m[1]) || 0;
+    let name = normalizeReservaText(m[2]);
+    let key = RESERVA_ALIASES[name];
+
+    if (!key) {
+      for (const alias in RESERVA_ALIASES) {
+        if (name.includes(alias)) {
+          key = RESERVA_ALIASES[alias];
+          break;
+        }
+      }
+    }
+
+    if (key && out[key] !== undefined) {
+      out[key] += qty;
+    }
+  }
+
+  return out;
+}
+
+function restoreToEstoque(qtysObj) {
+  for (const key in qtysObj) {
+    if (qtysObj[key] > 0 && estoqueCache[key] !== undefined) {
+      estoqueCache[key] = (estoqueCache[key] || 0) + qtysObj[key];
+    }
+  }
+  salvarEstoqueSilencioso();
+  renderStockBadgesOnVenda();
+}
+
 function renderStockBadgesOnVenda() {
   if (!estoqueLoaded) return;
   for (const key in PRODUCTS) {
     const nameEl = document.querySelector(`#row-${key} .product-name`);
     if (!nameEl) continue;
-    // Remove old badge
     const old = nameEl.querySelector('.stock-badge');
     if (old) old.remove();
     const qty = estoqueCache[key] !== undefined ? estoqueCache[key] : null;
@@ -2095,9 +2305,8 @@ function renderStockBadgesOnVenda() {
   }
 }
 
-// Validate stock before registering
 function checkStockBeforeSubmit(qtysObj) {
-  if (!estoqueLoaded) return true; // skip if not loaded
+  if (!estoqueLoaded) return true;
   const problems = [];
   for (const key in qtysObj) {
     if (qtysObj[key] > 0) {
