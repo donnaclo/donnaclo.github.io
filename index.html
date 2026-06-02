@@ -1192,7 +1192,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxb8maogqFnAQt61dofl8OVYr-CTVsIfGRNiTCDO4AtsVpcr5mDlySEMuNIJGtQ3Cwt/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbze0Cx8X93yqBHUk3saeOcZdpu-3DfMtaQcsjSxjXM2KCTIbM_S4mmhfIyk5hvaTP2S/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1619,35 +1619,18 @@ function setEncFilter(f) {
 }
 
 function loadEncomendas() {
-  const listEl = document.getElementById('enc-list');
-  listEl.innerHTML = '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
-
-  // JSONP fallback to avoid browser/CORS issues with Apps Script GET
-  const cbName = '__encLoadCb_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
-  const script = document.createElement('script');
-
-  const cleanup = () => {
-    try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
-    if (script.parentNode) script.parentNode.removeChild(script);
-  };
-
-  window[cbName] = function(data) {
-    cleanup();
-    try {
-      encAll = Array.isArray(data && data.encomendas) ? data.encomendas : [];
+  document.getElementById('enc-list').innerHTML =
+    '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
+  fetch(`${SCRIPT_URL}?action=encomendas`)
+    .then(r => r.json())
+    .then(data => {
+      encAll = Array.isArray(data.encomendas) ? data.encomendas : [];
       renderEncCards(encAll);
-    } catch (err) {
-      listEl.innerHTML = '<div class="enc-empty"><div class="enc-empty-icon">⚠️</div>Erro ao carregar. Verifique a conexão.</div>';
-    }
-  };
-
-  script.onerror = function() {
-    cleanup();
-    listEl.innerHTML = '<div class="enc-empty"><div class="enc-empty-icon">⚠️</div>Erro ao carregar. Verifique a conexão.</div>';
-  };
-
-  script.src = `${SCRIPT_URL}?action=encomendas&callback=${cbName}&_=${Date.now()}`;
-  document.body.appendChild(script);
+    })
+    .catch(() => {
+      document.getElementById('enc-list').innerHTML =
+        '<div class="enc-empty"><div class="enc-empty-icon">⚠️</div>Erro ao carregar. Verifique a conexão.</div>';
+    });
 }
 
 function renderEncCards(list) {
