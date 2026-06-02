@@ -1192,7 +1192,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2PR-dhaEBi-5OlpnqTXEjBSbvDgVg498RChN9lrL35eO86mvEDxS2Ck8CqsBWRem6/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhr6jP__aSUWZPX_5bPAVRaOu-km2PgtyB3RsFoFI96dhZWfNWrdFthwtoGRqtwfvH/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1228,37 +1228,9 @@ let consultaAtual = null;
 
 let allClientes = [];
 
-// ── API GET (JSONP para leitura sem CORS) ───────────────
-function apiGet(params) {
-  return new Promise((resolve, reject) => {
-    const cb = '__dc_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const qs = new URLSearchParams({ ...params, callback: cb }).toString();
-    const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('Timeout ao consultar a planilha'));
-    }, 12000);
-
-    function cleanup() {
-      clearTimeout(timeout);
-      if (script.parentNode) script.parentNode.removeChild(script);
-      try { delete window[cb]; } catch (e) { window[cb] = undefined; }
-    }
-
-    window[cb] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-
-    script.src = `${SCRIPT_URL}?${qs}`;
-    script.async = true;
-    script.onerror = () => {
-      cleanup();
-      reject(new Error('Falha ao carregar dados'));
-    };
-    document.body.appendChild(script);
-  });
-}
+// ── ENCOMENDAS STATE ─────────────────────────────────────
+let encFilter = 'todos';
+let encAll    = [];
 
 // ── INIT ────────────────────────────────────────────────
 window.onload = () => {
@@ -1268,7 +1240,8 @@ window.onload = () => {
   selectEmpresa('Outro');
   loadClientes();
   // Pre-load estoque silently → shows badges on venda tab immediately
-  apiGet({ action: 'estoque' })
+  fetch(`${SCRIPT_URL}?action=estoque`)
+    .then(r => r.json())
     .then(data => {
       estoqueCache = data.estoque || {};
       estoqueLoaded = true;
@@ -1458,7 +1431,8 @@ function normalizeText(str) {
 }
 
 function loadClientes() {
-  apiGet({ action: 'nomes' })
+  fetch(`${SCRIPT_URL}?action=nomes`)
+    .then(r => r.json())
     .then(data => {
       allClientes = Array.isArray(data.clientes) ? data.clientes : [];
       const dl = document.getElementById('clientes-list');
@@ -1535,7 +1509,10 @@ function executarBuscaCliente(nome) {
     '<div class="loading-state"><div class="spinner"></div>Buscando dados...</div>';
   document.getElementById('section-pendentes').style.display = 'none';
 
-  apiGet({ action: 'consulta', cliente: nome })
+  const url = `${SCRIPT_URL}?action=consulta&cliente=${encodeURIComponent(nome)}`;
+
+  fetch(url)
+    .then(r => r.json())
     .then(data => {
       if (data.error) { showToast('⚠️ '+data.error); return; }
       renderConsulta(data);
@@ -1648,7 +1625,8 @@ function setEncFilter(f) {
 function loadEncomendas() {
   document.getElementById('enc-list').innerHTML =
     '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
-  apiGet({ action: 'encomendas' })
+  fetch(`${SCRIPT_URL}?action=encomendas`)
+    .then(r => r.json())
     .then(data => {
       encAll = Array.isArray(data.encomendas) ? data.encomendas : [];
       renderEncCards(encAll);
@@ -1884,64 +1862,8 @@ function salvarEncomenda() {
   .catch(() => showToast('⚠️ Erro ao salvar.'));
 }
 
-function updateEncStatus(id, novoStatus) {
-  const labels = { pronto: 'Pronto', entregue: 'Entregue' };
-  showToast(`Atualizando para ${labels[novoStatus]}...`);
-  fetch(SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ tipo: 'update_encomenda', id, status: novoStatus })
-  })
-  .then(() => {
-    showToast('✓ Status atualizado!');
-    // Optimistic update in cache
-    const enc = encAll.find(e => e.id === id);
-    if (enc) enc.status = novoStatus;
-    renderEncCards(encAll);
-  })
-  .catch(() => showToast('⚠️ Erro ao atualizar.'));
-}
-
-// ── ARQUIVAR ENCOMENDA → VENDAS ──────────────────────────
-function arquivarEncomenda(id) {
-  const enc = encAll.find(e => e.id === id);
-  if (!enc) { showToast('⚠️ Encomenda não encontrada'); return; }
-
-  showToast('Arquivando em Vendas...');
-
-  // today as yyyy-MM-dd for the spreadsheet
-  const hoje = new Date();
-  const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
-
-  const payload = {
-    tipo: 'arquivar_encomenda',
-    enc_id: id,
-    // venda row data
-    data:       enc.dataEntrega || dataHoje,
-    cliente:    enc.cliente,
-    empresa:    '',
-    itens:      enc.descricao,
-    total:      enc.valor,
-    pagamento:  enc.status === 'entregue' ? 'Pago' : 'Pendente',
-    obs:        enc.descricao
-  };
-
-  fetch(SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  })
-  .then(() => {
-    showToast('✓ Arquivado em Vendas e removido!');
-    // remove from cache and re-render
-    encAll = encAll.filter(e => e.id !== id);
-    renderEncCards(encAll);
-  })
-  .catch(() => showToast('⚠️ Erro ao arquivar.'));
-}
-
-// ── encCard: show arquivar for pronto/entregue ────────────
-// (already wired in encCard via arquivarEncomenda)
+// ── RESERVAS ─────────────────────────────────────────────
+// (updateEncStatus e arquivarEncomenda já definidos acima — versões corretas mantidas)
 
 // ── RESERVAS ─────────────────────────────────────────────
 let resFilter = 'todos';
@@ -1959,7 +1881,8 @@ function setResFilter(f) {
 function loadReservas() {
   document.getElementById('res-list').innerHTML =
     '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
-  apiGet({ action: 'reservas' })
+  fetch(`${SCRIPT_URL}?action=reservas`)
+    .then(r => r.json())
     .then(data => {
       resAll = Array.isArray(data.reservas) ? data.reservas : [];
       renderResCards(resAll);
@@ -2099,7 +2022,8 @@ let estoqueLoaded = false;
 function loadEstoque() {
   document.getElementById('est-list').innerHTML =
     '<div class="enc-loading"><div class="spinner"></div>Carregando...</div>';
-  apiGet({ action: 'estoque' })
+  fetch(`${SCRIPT_URL}?action=estoque`)
+    .then(r => r.json())
     .then(data => {
       estoqueCache = data.estoque || {};
       estoqueLoaded = true;
