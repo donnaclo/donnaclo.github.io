@@ -1192,7 +1192,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhr6jP__aSUWZPX_5bPAVRaOu-km2PgtyB3RsFoFI96dhZWfNWrdFthwtoGRqtwfvH/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylveArLHKKCeqc9KdpvFpgs2Ro95L2dAyTWOuZ8fvtvo-mPYSgJ-oacCcwa3tqJj3-/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1225,7 +1225,8 @@ const qtys = {};
 for (const k in PRODUCTS) qtys[k] = 0;
 
 let consultaAtual = null;
-
+let consultaBase = null;
+let consultaChoices = [];
 let allClientes = [];
 
 // ── ENCOMENDAS STATE ─────────────────────────────────────
@@ -1422,12 +1423,17 @@ function limparBusca() {
   sug.innerHTML = '';
 }
 
+
 function normalizeText(str) {
   return String(str || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .trim();
+}
+
+function escapeRegex(str) {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function loadClientes() {
@@ -1445,10 +1451,19 @@ function loadClientes() {
     .catch(() => {});
 }
 
-function getMatchingClientes(nome) {
+function matchesClienteQuery(nome, query) {
   const n = normalizeText(nome);
-  if (!n) return [];
-  return allClientes.filter(c => normalizeText(c).includes(n));
+  const q = normalizeText(query);
+  if (!n || !q) return false;
+  if (n === q) return true;
+  const re = new RegExp('(^|\\s)' + escapeRegex(q));
+  return re.test(n);
+}
+
+function getMatchingClientes(nome) {
+  const q = normalizeText(nome);
+  if (!q) return [];
+  return allClientes.filter(c => matchesClienteQuery(c, q));
 }
 
 function renderClientSuggestions(matches) {
@@ -1473,10 +1488,15 @@ function renderClientSuggestions(matches) {
     </div>`;
 }
 
+function clearClientSuggestions() {
+  const box = document.getElementById('cliente-suggestions');
+  box.style.display = 'none';
+  box.innerHTML = '';
+}
+
 function buscarClienteExato(nome) {
   document.getElementById('busca-nome').value = nome;
-  document.getElementById('cliente-suggestions').style.display = 'none';
-  document.getElementById('cliente-suggestions').innerHTML = '';
+  clearClientSuggestions();
   executarBuscaCliente(nome);
 }
 
@@ -1499,8 +1519,7 @@ function buscarCliente() {
     return;
   }
 
-  document.getElementById('cliente-suggestions').style.display = 'none';
-  document.getElementById('cliente-suggestions').innerHTML = '';
+  clearClientSuggestions();
   executarBuscaCliente(nome);
 }
 
@@ -1515,12 +1534,100 @@ function executarBuscaCliente(nome) {
     .then(r => r.json())
     .then(data => {
       if (data.error) { showToast('⚠️ '+data.error); return; }
-      renderConsulta(data);
+      processConsultaResultado(data);
     })
     .catch(() => {
       document.getElementById('list-historico').innerHTML =
         '<div class="empty-state"><div class="empty-icon">⚠️</div>Erro ao conectar. Verifique a conexão.</div>';
     });
+}
+
+function getConsultaChoices(registros) {
+  const seen = new Set();
+  const out = [];
+  (registros || []).forEach(r => {
+    const cliente = String(r.cliente || '').trim();
+    const empresa = String(r.empresa || '').trim();
+    const key = normalizeText(cliente) + '||' + normalizeText(empresa);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push({ cliente, empresa, key });
+  });
+  return out;
+}
+
+function renderConsultaChoices(choices) {
+  const box = document.getElementById('cliente-suggestions');
+  if (!choices.length) {
+    clearClientSuggestions();
+    return;
+  }
+  box.style.display = '';
+  box.innerHTML = `
+    <div class="client-suggestion-wrap">
+      <div class="client-suggestion-title">Foram encontrados clientes parecidos. Escolha um:</div>
+      <div class="client-suggestion-list">
+        ${choices.slice(0, 12).map(opt => `
+          <button class="client-suggestion-btn" type="button" onclick='selecionarConsultaIdentidade(${JSON.stringify(opt.cliente)}, ${JSON.stringify(opt.empresa)})'>
+            ${opt.cliente}${opt.empresa ? ` <span style="color:var(--brown-light)">(${opt.empresa})</span>` : ''}
+            <div class="client-suggestion-meta">Toque para abrir só este cliente</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function selecionarConsultaIdentidade(cliente, empresa) {
+  if (!consultaBase || !Array.isArray(consultaBase.registros)) return;
+
+  const filtered = consultaBase.registros.filter(r => {
+    const sameCliente = normalizeText(r.cliente) === normalizeText(cliente);
+    const sameEmpresa = normalizeText(r.empresa || '') === normalizeText(empresa || '');
+    return sameCliente && sameEmpresa;
+  });
+
+  clearClientSuggestions();
+  renderConsulta(buildConsultaData(filtered));
+}
+
+function buildConsultaData(registros) {
+  let totalGeral = 0, totalPago = 0, totalPendente = 0;
+  (registros || []).forEach(r => {
+    const t = parseFloat(r.total) || 0;
+    totalGeral += t;
+    if ((r.pagamento || '').toLowerCase() === 'pago') totalPago += t;
+    if ((r.pagamento || '').toLowerCase() === 'pendente') totalPendente += t;
+  });
+  return {
+    registros: registros || [],
+    totalGeral,
+    totalPago,
+    totalPendente
+  };
+}
+
+function processConsultaResultado(data) {
+  consultaBase = data;
+  consultaChoices = getConsultaChoices(data.registros || []);
+
+  if (consultaChoices.length > 1) {
+    consultaAtual = null;
+    document.getElementById('list-historico').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">🔎</div>Encontrei mais de um cliente com esse nome. Escolha abaixo.</div>';
+    document.getElementById('section-pendentes').style.display = 'none';
+    document.getElementById('kpi-total').textContent = '—';
+    document.getElementById('kpi-pago').textContent = '—';
+    document.getElementById('kpi-pendente').textContent = '—';
+    document.getElementById('kpi-pedidos').textContent = 'Selecione um cliente';
+    document.getElementById('kpi-ultima').textContent = '—';
+    document.getElementById('kpi-ultima-sub').textContent = 'Várias opções encontradas';
+    renderConsultaChoices(consultaChoices);
+    showToast('ℹ️ Selecione o cliente correto');
+    return;
+  }
+
+  clearClientSuggestions();
+  renderConsulta(data);
 }
 
 
@@ -1551,6 +1658,8 @@ function histItem(r, showPayBtn = false) {
 
 function renderConsulta(data) {
   consultaAtual = data;
+  consultaBase = null;
+  consultaChoices = [];
 
   const { registros, totalGeral, totalPago, totalPendente } = data;
 
