@@ -1011,6 +1011,50 @@
     text-align: center; padding: 40px 20px; color: var(--gray-soft); font-size: 13px;
   }
 
+  /* ── DRE — Resultado Real ──────────────────────────── */
+  .dre-section { margin-bottom: 8px; }
+  .dre-row {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 8px;
+  }
+  .dre-row.dre-lucro-pos {
+    background: #EBF6EF; border-color: rgba(45,122,74,0.3);
+  }
+  .dre-row.dre-lucro-neg {
+    background: #FCECEA; border-color: rgba(176,48,32,0.3);
+  }
+  .dre-row-icon { font-size: 24px; flex-shrink: 0; line-height: 1; }
+  .dre-row-info { flex: 1; min-width: 0; }
+  .dre-row-label {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--gray-soft); margin-bottom: 4px;
+  }
+  .dre-row-val {
+    font-family: 'Playfair Display', serif; font-size: 22px;
+    color: var(--brown-dark); line-height: 1;
+  }
+  .dre-row-val.dre-red { color: var(--red-warn); }
+  .dre-row-val.dre-pos { color: var(--green-ok); }
+  .dre-row-val.dre-neg { color: var(--red-warn); }
+  .dre-row-sub { font-size: 11px; color: var(--gray-soft); margin-top: 4px; }
+  .dre-op {
+    text-align: center; font-size: 16px; font-weight: 600;
+    color: var(--gray-soft); letter-spacing: 0.05em; padding: 2px 0;
+    margin-bottom: 8px; line-height: 1;
+  }
+  .dre-op span { background: var(--cream); padding: 0 10px; position: relative; }
+  .dre-op::before {
+    content: ''; display: block; height: 1px;
+    background: var(--border); margin-top: 11px;
+  }
+
+  /* Fichas: simplify margin badge to 2 states */
+  .ficha-margem.verde  { background: #EBF6EF; color: var(--green-ok); }
+  .ficha-margem.laranja { background: #FEF3E2; color: #B85C00; }
+  .ficha-margem.vermelho { background: #FCECEA; color: var(--red-warn); }
+
 </style>
 </head>
 <body>
@@ -1415,7 +1459,55 @@
       <div class="gerente-loading"><div class="spinner"></div>Carregando...</div>
     </div>
 
-  </div>
+    <!-- ── DRE: Resultado Real ──────────────────────────── -->
+    <div class="fin-section-title" style="margin-top:28px;">📊 DRE — Resultado Real</div>
+    <div class="dre-section" id="dre-section">
+
+      <div class="dre-row" id="dre-row-fat">
+        <div class="dre-row-icon">💰</div>
+        <div class="dre-row-info">
+          <div class="dre-row-label">Faturamento Bruto</div>
+          <div class="dre-row-val" id="dre-fat">—</div>
+          <div class="dre-row-sub" id="dre-fat-sub">Total de vendas no período</div>
+        </div>
+      </div>
+
+      <div class="dre-op"><span>−&nbsp; Custo</span></div>
+
+      <div class="dre-row" id="dre-row-cmv">
+        <div class="dre-row-icon">🍫</div>
+        <div class="dre-row-info">
+          <div class="dre-row-label">Custo de Produção (CMV)</div>
+          <div class="dre-row-val dre-red" id="dre-cmv">—</div>
+          <div class="dre-row-sub" id="dre-cmv-sub">Calculado pelas fichas técnicas</div>
+        </div>
+      </div>
+
+      <div class="dre-op"><span>−&nbsp; Despesas</span></div>
+
+      <div class="dre-row" id="dre-row-desp">
+        <div class="dre-row-icon">📉</div>
+        <div class="dre-row-info">
+          <div class="dre-row-label">Despesas Fixas</div>
+          <div class="dre-row-val dre-red" id="dre-desp">—</div>
+          <div class="dre-row-sub" id="dre-desp-sub">MEI, aluguel, luz, gás...</div>
+        </div>
+      </div>
+
+      <div class="dre-op"><span>=&nbsp; Resultado</span></div>
+
+      <div class="dre-row" id="dre-row-lucro">
+        <div class="dre-row-icon" id="dre-lucro-icon">💵</div>
+        <div class="dre-row-info">
+          <div class="dre-row-label">Lucro Líquido Real</div>
+          <div class="dre-row-val" id="dre-lucro">—</div>
+          <div class="dre-row-sub">Faturamento − CMV − Despesas Fixas</div>
+        </div>
+      </div>
+
+    </div><!-- #dre-section -->
+
+  </div><!-- gsub-page-financeiro -->
 
   <!-- ── SUB: FICHAS TÉCNICAS ──────────────────────────── -->
   <div id="gsub-page-fichas" class="gerente-subpage">
@@ -1458,7 +1550,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7O9zqvNAXm3JiUP79thFhH6q-Cc1pGs6-ccLgnpgeh3qp34ZUKAA4_PzIM8CXS0k/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuY2D5iJO0c9ifvnv6HxqKrczxr65Nz1kI7wIYlafd45AC3UnQknn7rkt4yII-If_T/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -2710,7 +2802,6 @@ function renderFinanceiro(vendas) {
     fat  += t;
     if ((v.pagamento||'').toLowerCase() === 'pago')     rec  += t;
     if ((v.pagamento||'').toLowerCase() === 'pendente') pend += t;
-    // Count products sold
     for (const k in PRODUCTS) {
       const qty = parseInt(v['qty_'+k]) || 0;
       if (qty > 0) prodCount[k] = (prodCount[k]||0) + qty;
@@ -2726,27 +2817,98 @@ function renderFinanceiro(vendas) {
   document.getElementById('fin-ticket').textContent          = fmtR(ticket);
   document.getElementById('fin-ticket-sub').textContent      = `${filtered.length} vendas no período`;
 
-  // Top products
-  const sorted = Object.entries(prodCount)
-    .sort((a,b) => b[1]-a[1]).slice(0,8);
-
+  // ── Top produtos ──────────────────────────────────────
+  const sorted = Object.entries(prodCount).sort((a,b) => b[1]-a[1]).slice(0,8);
   if (sorted.length === 0) {
     document.getElementById('fin-top-produtos').innerHTML =
       '<div class="fin-produto-row" style="justify-content:center;color:var(--gray-soft);">Nenhuma venda no período.</div>';
-    return;
+  } else {
+    document.getElementById('fin-top-produtos').innerHTML = sorted.map(([k,qty]) => {
+      const p = PRODUCTS[k];
+      const total_prod = qty * (p ? p.price : 0);
+      return `
+      <div class="fin-produto-row">
+        <div>
+          <div class="fin-produto-nome">${p ? p.name : k}</div>
+          <div class="fin-produto-sub">${qty} unidades vendidas</div>
+        </div>
+        <div class="fin-produto-val">${fmtR(total_prod)}</div>
+      </div>`;
+    }).join('');
   }
-  document.getElementById('fin-top-produtos').innerHTML = sorted.map(([k,qty]) => {
-    const p = PRODUCTS[k];
-    const total_prod = qty * (p ? p.price : 0);
-    return `
-    <div class="fin-produto-row">
-      <div>
-        <div class="fin-produto-nome">${p ? p.name : k}</div>
-        <div class="fin-produto-sub">${qty} unidades vendidas</div>
-      </div>
-      <div class="fin-produto-val">${fmtR(total_prod)}</div>
-    </div>`;
-  }).join('');
+
+  // ── DRE — Resultado Real ──────────────────────────────
+  const fichas      = (gerenteData && gerenteData.fichas)       ? gerenteData.fichas       : [];
+  const custosFixos = (gerenteData && gerenteData.custos_fixos) ? gerenteData.custos_fixos : [];
+
+  // 1. Custo unitário por produto (soma todos ingredientes da ficha)
+  const custoPorFicha = {};
+  fichas.forEach(row => {
+    const p = (row.produto || '').trim();
+    if (p) custoPorFicha[p] = (custoPorFicha[p] || 0) + (parseFloat(row.custo_proporcional) || 0);
+  });
+
+  // 2. Mapeia chave do PRODUCTS → custo unitário (match pelo nome)
+  const custoUnitario = {};
+  for (const k in PRODUCTS) {
+    const nomeProd = PRODUCTS[k].name.toLowerCase();
+    for (const fichaName in custoPorFicha) {
+      const fichaLow = fichaName.toLowerCase();
+      if (fichaLow === nomeProd || fichaLow.includes(nomeProd) || nomeProd.includes(fichaLow)) {
+        custoUnitario[k] = custoPorFicha[fichaName];
+        break;
+      }
+    }
+  }
+
+  // 3. CMV = Σ qty_vendida × custo_unitário
+  let cmv = 0;
+  for (const k in prodCount) {
+    cmv += (prodCount[k] || 0) * (custoUnitario[k] || 0);
+  }
+
+  // 4. Despesas Fixas
+  const despTotal = custosFixos.reduce((s, c) => s + (parseFloat(c.valor) || 0), 0);
+
+  // 5. Lucro Líquido
+  const lucro = fat - cmv - despTotal;
+
+  // 6. Renderiza DRE
+  const hasFichas = fichas.length > 0;
+  const hasDesp   = custosFixos.length > 0;
+
+  // Faturamento
+  document.getElementById('dre-fat').textContent     = fmtR(fat);
+  document.getElementById('dre-fat-sub').textContent = `${filtered.length} vendas · ${label}`;
+
+  // CMV
+  document.getElementById('dre-cmv').textContent = hasFichas ? fmtR(cmv) : 'Sem fichas';
+  document.getElementById('dre-cmv-sub').textContent = hasFichas
+    ? `${Object.keys(prodCount).filter(k => custoUnitario[k]).length} produtos com custo calculado`
+    : 'Cadastre fichas técnicas no Sheets';
+
+  // Despesas Fixas
+  document.getElementById('dre-desp').textContent = hasDesp ? fmtR(despTotal) : 'Não cadastrado';
+  document.getElementById('dre-desp-sub').textContent = hasDesp
+    ? `${custosFixos.length} despesa${custosFixos.length !== 1 ? 's' : ''} cadastrada${custosFixos.length !== 1 ? 's' : ''}`
+    : 'Crie a aba Custos_Fixos no Sheets';
+
+  // Lucro Líquido
+  const lucroEl   = document.getElementById('dre-lucro');
+  const lucroCard = document.getElementById('dre-row-lucro');
+  const lucroIcon = document.getElementById('dre-lucro-icon');
+
+  if (!hasFichas && !hasDesp) {
+    lucroEl.textContent   = '—';
+    lucroEl.className     = 'dre-row-val';
+    lucroCard.className   = 'dre-row';
+    lucroIcon.textContent = '💵';
+  } else {
+    lucroEl.textContent   = fmtR(lucro);
+    lucroEl.className     = 'dre-row-val ' + (lucro >= 0 ? 'dre-pos' : 'dre-neg');
+    lucroCard.className   = 'dre-row ' + (lucro >= 0 ? 'dre-lucro-pos' : 'dre-lucro-neg');
+    lucroIcon.textContent = lucro >= 0 ? '🟢' : '🔴';
+  }
 }
 
 function parseVendaDate(str) {
@@ -2775,7 +2937,7 @@ function renderFichas(fichas) {
     return;
   }
 
-  // Group by product
+  // Agrupa por produto
   const byProd = {};
   fichas.forEach(row => {
     const p = row.produto || '—';
@@ -2785,33 +2947,46 @@ function renderFichas(fichas) {
   });
 
   document.getElementById('fichas-list').innerHTML = Object.entries(byProd).map(([prod, info]) => {
-    // Find product price
-    const pKey = Object.keys(PRODUCTS).find(k => PRODUCTS[k].name.toLowerCase().includes(prod.toLowerCase()));
-    const preco = pKey ? PRODUCTS[pKey].price : null;
-    const custo = info.custo;
+    // Busca preço de venda no objeto PRODUCTS
+    const pKey  = Object.keys(PRODUCTS).find(k =>
+      PRODUCTS[k].name.toLowerCase().includes(prod.toLowerCase()) ||
+      prod.toLowerCase().includes(PRODUCTS[k].name.toLowerCase())
+    );
+    const preco  = pKey ? PRODUCTS[pKey].price : null;
+    const custo  = info.custo;
     const margem = preco ? ((preco - custo) / preco * 100) : null;
-    const margemClass = margem === null ? '' : margem >= 50 ? 'boa' : margem >= 30 ? 'ok' : 'ruim';
-    const margemLabel = margem !== null ? `${margem.toFixed(0)}% margem` : '';
+
+    // Etapa 3: apenas 2 estados — verde ≥ 50%, vermelho < 50%
+    const margemClass = margem === null ? '' : margem >= 50 ? 'verde' : 'vermelho';
+    const margemTxt   = margem !== null ? `${margem.toFixed(0)}% margem` : 'sem preço';
 
     const ingsHtml = info.ings.map(ing => `
       <div class="ficha-ing-row">
         <div>
           <div class="ficha-ing-nome">${ing.ingrediente || '—'}</div>
-          <div class="ficha-ing-qty">${ing.qtd_usada_g ? ing.qtd_usada_g+'g' : ''}</div>
+          <div class="ficha-ing-qty">${ing.qtd_usada_g ? ing.qtd_usada_g + 'g' : ''}</div>
         </div>
         <div class="ficha-ing-custo">R$ ${(parseFloat(ing.custo_proporcional)||0).toFixed(3).replace('.',',')}</div>
       </div>`).join('');
 
+    // Barra de margem visual (fill proporcional)
+    const barWidth = margem !== null ? Math.min(100, Math.max(0, margem)).toFixed(0) : 0;
+    const barColor = margem !== null && margem >= 50 ? 'var(--green-ok)' : 'var(--red-warn)';
+
     return `
     <div class="ficha-card">
       <div class="ficha-header" onclick="toggleFicha(this)">
-        <div>
+        <div style="flex:1;min-width:0;">
           <div class="ficha-produto">${prod}</div>
-          ${preco ? `<div style="font-size:11px;color:var(--gray-soft);">Venda: R$ ${preco},00</div>` : ''}
+          <div style="margin-top:6px;">
+            <div style="height:4px;border-radius:4px;background:var(--border);overflow:hidden;">
+              <div style="height:100%;width:${barWidth}%;background:${barColor};border-radius:4px;transition:width 0.4s;"></div>
+            </div>
+          </div>
+          ${preco ? `<div style="font-size:11px;color:var(--gray-soft);margin-top:4px;">Custo R$ ${custo.toFixed(2).replace('.',',')} · Venda R$ ${preco},00</div>` : ''}
         </div>
-        <div style="display:flex;align-items:center;">
-          <div class="ficha-custo-total">R$ ${custo.toFixed(2).replace('.',',')}</div>
-          ${margemLabel ? `<span class="ficha-margem ${margemClass}">${margemLabel}</span>` : ''}
+        <div style="display:flex;align-items:flex-start;padding-left:10px;flex-shrink:0;">
+          ${margemClass ? `<span class="ficha-margem ${margemClass}">${margemTxt}</span>` : ''}
         </div>
       </div>
       <div class="ficha-body">${ingsHtml}</div>
