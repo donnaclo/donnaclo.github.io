@@ -833,6 +833,184 @@
   .stock-badge.low  { background: #FEF3E2; color: #B85C00; }
   .stock-badge.ok   { background: #EBF6EF; color: var(--green-ok); }
 
+  /* ── GERENTE PAGE ────────────────────────────────────── */
+  #page-gerente { padding-bottom: 40px; }
+
+  .gerente-sub-nav {
+    display: flex; gap: 6px;
+    margin: 4px 0 20px;
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 5px;
+  }
+  .gsub-btn {
+    flex: 1; padding: 9px 6px; border-radius: 9px; border: none;
+    background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+    color: var(--gray-soft); cursor: pointer;
+    transition: all 0.15s; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gsub-btn.active {
+    background: var(--brown-dark); color: var(--brown-pale);
+  }
+
+  .gerente-subpage { display: none; }
+  .gerente-subpage.active { display: block; }
+
+  /* Painel Financeiro */
+  .fin-period-bar {
+    display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .fin-period-bar::-webkit-scrollbar { display: none; }
+  .fin-period-btn {
+    flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); background: var(--warm-white);
+    color: var(--gray-soft); font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+  }
+  .fin-period-btn.active {
+    background: var(--brown-dark); color: var(--brown-pale); border-color: var(--brown-dark);
+  }
+  .fin-kpi-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;
+  }
+  .fin-kpi {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px;
+  }
+  .fin-kpi-label {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--gray-soft); margin-bottom: 6px;
+  }
+  .fin-kpi-val {
+    font-family: 'Playfair Display', serif; font-size: 22px;
+    color: var(--brown-dark); line-height: 1;
+  }
+  .fin-kpi-val.green { color: var(--green-ok); }
+  .fin-kpi-val.red   { color: var(--red-warn); }
+  .fin-kpi-val.blue  { color: #4338CA; }
+  .fin-kpi-sub { font-size: 11px; color: var(--gray-soft); margin-top: 4px; }
+
+  .fin-section-title {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--brown-light); margin: 20px 0 10px;
+  }
+  .fin-produto-row {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; gap: 10px;
+  }
+  .fin-produto-nome { font-size: 14px; font-weight: 500; color: var(--brown-dark); }
+  .fin-produto-sub  { font-size: 11px; color: var(--gray-soft); margin-top: 2px; }
+  .fin-produto-val  { font-size: 14px; font-weight: 500; color: var(--brown-mid); white-space: nowrap; }
+
+  /* Fichas Técnicas */
+  .ficha-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 10px; overflow: hidden;
+  }
+  .ficha-header {
+    padding: 12px 16px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ficha-produto { font-size: 15px; font-weight: 500; color: var(--brown-dark); }
+  .ficha-custo-total {
+    font-family: 'Playfair Display', serif; font-size: 16px;
+    color: var(--brown-mid); white-space: nowrap;
+  }
+  .ficha-margem {
+    font-size: 10px; font-weight: 500; padding: 2px 8px;
+    border-radius: 20px; margin-left: 8px;
+  }
+  .ficha-margem.boa    { background: #EBF6EF; color: var(--green-ok); }
+  .ficha-margem.ok     { background: #FEF3E2; color: #B85C00; }
+  .ficha-margem.ruim   { background: #FCECEA; color: var(--red-warn); }
+  .ficha-body { display: none; padding: 0 16px 12px; }
+  .ficha-body.open { display: block; }
+  .ficha-ing-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .ficha-ing-row:last-child { border-bottom: none; }
+  .ficha-ing-nome { color: var(--brown-dark); }
+  .ficha-ing-qty  { color: var(--gray-soft); font-size: 11px; margin-top: 1px; }
+  .ficha-ing-custo { color: var(--brown-mid); font-weight: 500; white-space: nowrap; }
+
+  .ficha-empty {
+    text-align: center; padding: 30px 20px;
+    color: var(--gray-soft); font-size: 13px; line-height: 1.6;
+  }
+
+  /* Insumos */
+  .ins-add-btn {
+    width: 100%; padding: 11px; margin-bottom: 14px;
+    background: var(--brown-light); color: white; border: none;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: background 0.15s;
+  }
+  .ins-add-btn:active { background: var(--brown-mid); }
+
+  .ins-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ins-info { flex: 1; min-width: 0; }
+  .ins-nome  { font-size: 14px; font-weight: 500; color: var(--brown-dark); }
+  .ins-preco { font-size: 12px; color: var(--gray-soft); margin-top: 2px; }
+  .ins-custo-g {
+    font-size: 12px; font-weight: 500; color: var(--brown-mid);
+    background: #F6ECDE; padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .ins-edit-btn {
+    width: 32px; height: 32px; border: 1px solid var(--border);
+    background: var(--cream); border-radius: 8px; font-size: 14px;
+    cursor: pointer; flex-shrink: 0; display: flex;
+    align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+  }
+
+  /* Inline edit row */
+  .ins-edit-row {
+    background: #F6ECDE; border: 1px solid var(--brown-light);
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+  }
+  .ins-edit-row label {
+    font-size: 10px; color: var(--brown-mid); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 4px;
+  }
+  .ins-edit-row input {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; width: 100%; outline: none; margin-bottom: 8px;
+    -webkit-appearance: none;
+  }
+  .ins-edit-row input:focus { border-color: var(--brown-light); }
+  .ins-edit-btns { display: flex; gap: 8px; }
+  .ins-save-btn {
+    flex: 1; padding: 9px; background: var(--brown-light); color: white;
+    border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ins-cancel-btn {
+    padding: 9px 14px; background: var(--cream); color: var(--gray-soft);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .gerente-loading {
+    text-align: center; padding: 40px 20px; color: var(--gray-soft); font-size: 13px;
+  }
+
 </style>
 </head>
 <body>
@@ -855,6 +1033,9 @@
     </button>
     <button class="tab-btn" id="tab-estoque"    onclick="switchTab('estoque')">
       <span class="tab-emoji">📊</span><span class="tab-label">Estoque</span>
+    </button>
+    <button class="tab-btn" id="tab-gerente"    onclick="switchTab('gerente')">
+      <span class="tab-emoji">⚙️</span><span class="tab-label">Gerente</span>
     </button>
   </div>
 </header>
@@ -1180,6 +1361,91 @@
 </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     PAGE: GERENTE
+════════════════════════════════════════════════════════ -->
+<div id="page-gerente" class="page">
+<div class="container">
+
+  <p class="section-label" style="margin-top:4px;">Área do Gerente</p>
+
+  <!-- Sub-nav -->
+  <div class="gerente-sub-nav">
+    <button class="gsub-btn active" id="gsub-financeiro" onclick="switchGSub('financeiro')">📈 Financeiro</button>
+    <button class="gsub-btn"        id="gsub-fichas"     onclick="switchGSub('fichas')">📋 Fichas</button>
+    <button class="gsub-btn"        id="gsub-insumos"    onclick="switchGSub('insumos')">🍫 Insumos</button>
+  </div>
+
+  <!-- ── SUB: PAINEL FINANCEIRO ────────────────────────── -->
+  <div id="gsub-page-financeiro" class="gerente-subpage active">
+
+    <div class="fin-period-bar">
+      <button class="fin-period-btn active" id="fp-7"   onclick="setFinPeriod(7)">7 dias</button>
+      <button class="fin-period-btn"        id="fp-30"  onclick="setFinPeriod(30)">30 dias</button>
+      <button class="fin-period-btn"        id="fp-90"  onclick="setFinPeriod(90)">3 meses</button>
+      <button class="fin-period-btn"        id="fp-365" onclick="setFinPeriod(365)">12 meses</button>
+      <button class="fin-period-btn"        id="fp-0"   onclick="setFinPeriod(0)">Tudo</button>
+    </div>
+
+    <div class="fin-kpi-grid">
+      <div class="fin-kpi">
+        <div class="fin-kpi-label">Faturamento</div>
+        <div class="fin-kpi-val" id="fin-faturamento">—</div>
+        <div class="fin-kpi-sub" id="fin-faturamento-sub">aguardando...</div>
+      </div>
+      <div class="fin-kpi">
+        <div class="fin-kpi-label">Já Recebido</div>
+        <div class="fin-kpi-val green" id="fin-recebido">—</div>
+        <div class="fin-kpi-sub">Vendas pagas</div>
+      </div>
+      <div class="fin-kpi">
+        <div class="fin-kpi-label">A Receber</div>
+        <div class="fin-kpi-val red" id="fin-pendente">—</div>
+        <div class="fin-kpi-sub">Vendas pendentes</div>
+      </div>
+      <div class="fin-kpi">
+        <div class="fin-kpi-label">Ticket Médio</div>
+        <div class="fin-kpi-val blue" id="fin-ticket">—</div>
+        <div class="fin-kpi-sub" id="fin-ticket-sub">por venda</div>
+      </div>
+    </div>
+
+    <div class="fin-section-title">Produtos mais vendidos</div>
+    <div id="fin-top-produtos">
+      <div class="gerente-loading"><div class="spinner"></div>Carregando...</div>
+    </div>
+
+  </div>
+
+  <!-- ── SUB: FICHAS TÉCNICAS ──────────────────────────── -->
+  <div id="gsub-page-fichas" class="gerente-subpage">
+    <div id="fichas-list">
+      <div class="gerente-loading"><div class="spinner"></div>Carregando fichas...</div>
+    </div>
+    <div class="ficha-empty" style="margin-top:10px;font-size:12px;color:var(--gray-soft);line-height:1.6;">
+      💡 As fichas são calculadas automaticamente pelo Google Sheets.<br>
+      Crie a aba <strong>Fichas_Tecnicas</strong> com as colunas:<br>
+      <em>Produto | Ingrediente | Qtd_Usada_g | Custo_Proporcional</em>
+    </div>
+  </div>
+
+  <!-- ── SUB: INSUMOS ──────────────────────────────────── -->
+  <div id="gsub-page-insumos" class="gerente-subpage">
+    <button class="ins-add-btn" onclick="abrirFormNovoInsumo()">+ Novo Insumo</button>
+    <div id="ins-novo-form" style="display:none;"></div>
+    <div id="insumos-list">
+      <div class="gerente-loading"><div class="spinner"></div>Carregando insumos...</div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--gray-soft);line-height:1.6;text-align:center;">
+      💡 Crie a aba <strong>Insumos</strong> no Sheets com:<br>
+      <em>Ingrediente | Preco_Pago | Qtd_Embalagem_g | Custo_g</em><br>
+      A coluna Custo_g use a fórmula <code>=B2/C2</code>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <!-- TOTAL BAR (venda only) -->
 <div class="total-bar" id="total-bar">
   <div style="min-width:0;flex:1;overflow:hidden;">
@@ -1192,7 +1458,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylveArLHKKCeqc9KdpvFpgs2Ro95L2dAyTWOuZ8fvtvo-mPYSgJ-oacCcwa3tqJj3-/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7O9zqvNAXm3JiUP79thFhH6q-Cc1pGs6-ccLgnpgeh3qp34ZUKAA4_PzIM8CXS0k/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1253,7 +1519,7 @@ window.onload = () => {
 
 // ── TABS ────────────────────────────────────────────────
 function switchTab(tab) {
-  ['venda','consulta','encomendas','reservas','estoque'].forEach(t => {
+  ['venda','consulta','encomendas','reservas','estoque','gerente'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('active', t === tab);
     document.getElementById('tab-'+t).classList.toggle('active', t === tab);
   });
@@ -1261,6 +1527,7 @@ function switchTab(tab) {
   if (tab === 'encomendas') loadEncomendas();
   if (tab === 'reservas')   loadReservas();
   if (tab === 'estoque')    loadEstoque();
+  if (tab === 'gerente')    loadGerente();
 }
 
 // ── VENDA LOGIC ─────────────────────────────────────────
@@ -2378,6 +2645,285 @@ function checkStockBeforeSubmit(qtysObj) {
     return false;
   }
   return true;
+}
+
+// ── GERENTE ──────────────────────────────────────────────
+let gerenteData     = null; // full data from server
+let finPeriodDias   = 7;
+let gerenteSubAtual = 'financeiro';
+
+function switchGSub(sub) {
+  gerenteSubAtual = sub;
+  ['financeiro','fichas','insumos'].forEach(s => {
+    document.getElementById('gsub-'+s).classList.toggle('active', s === sub);
+    document.getElementById('gsub-page-'+s).classList.toggle('active', s === sub);
+  });
+  if (sub === 'fichas'  && gerenteData) renderFichas(gerenteData.fichas || []);
+  if (sub === 'insumos' && gerenteData) renderInsumos(gerenteData.insumos || []);
+}
+
+function loadGerente() {
+  if (gerenteData) { renderGerente(); return; } // use cache
+  fetch(`${SCRIPT_URL}?action=dados_gerente`)
+    .then(r => r.json())
+    .then(data => {
+      gerenteData = data;
+      renderGerente();
+    })
+    .catch(() => {
+      document.getElementById('fin-top-produtos').innerHTML =
+        '<div class="ficha-empty">⚠️ Erro ao carregar. Verifique a conexão.</div>';
+    });
+}
+
+function reloadGerente() { gerenteData = null; loadGerente(); }
+
+function renderGerente() {
+  if (!gerenteData) return;
+  renderFinanceiro(gerenteData.vendas || []);
+  if (gerenteSubAtual === 'fichas')  renderFichas(gerenteData.fichas  || []);
+  if (gerenteSubAtual === 'insumos') renderInsumos(gerenteData.insumos || []);
+}
+
+// ── PAINEL FINANCEIRO ────────────────────────────────────
+function setFinPeriod(dias) {
+  finPeriodDias = dias;
+  ['7','30','90','365','0'].forEach(d => {
+    document.getElementById('fp-'+d).classList.toggle('active', String(dias) === d);
+  });
+  if (gerenteData) renderFinanceiro(gerenteData.vendas || []);
+}
+
+function renderFinanceiro(vendas) {
+  const hoje = new Date(); hoje.setHours(23,59,59,999);
+  const filtered = finPeriodDias === 0 ? vendas : vendas.filter(v => {
+    const d = parseVendaDate(v.data);
+    if (!d) return false;
+    const diffDias = (hoje - d) / 86400000;
+    return diffDias <= finPeriodDias;
+  });
+
+  let fat = 0, rec = 0, pend = 0;
+  const prodCount = {};
+  filtered.forEach(v => {
+    const t = parseFloat(v.total) || 0;
+    fat  += t;
+    if ((v.pagamento||'').toLowerCase() === 'pago')     rec  += t;
+    if ((v.pagamento||'').toLowerCase() === 'pendente') pend += t;
+    // Count products sold
+    for (const k in PRODUCTS) {
+      const qty = parseInt(v['qty_'+k]) || 0;
+      if (qty > 0) prodCount[k] = (prodCount[k]||0) + qty;
+    }
+  });
+  const ticket = filtered.length > 0 ? fat / filtered.length : 0;
+  const label = finPeriodDias === 0 ? 'total histórico' : `últimos ${finPeriodDias} dias`;
+
+  document.getElementById('fin-faturamento').textContent     = fmtR(fat);
+  document.getElementById('fin-faturamento-sub').textContent = `${filtered.length} vendas · ${label}`;
+  document.getElementById('fin-recebido').textContent        = fmtR(rec);
+  document.getElementById('fin-pendente').textContent        = fmtR(pend);
+  document.getElementById('fin-ticket').textContent          = fmtR(ticket);
+  document.getElementById('fin-ticket-sub').textContent      = `${filtered.length} vendas no período`;
+
+  // Top products
+  const sorted = Object.entries(prodCount)
+    .sort((a,b) => b[1]-a[1]).slice(0,8);
+
+  if (sorted.length === 0) {
+    document.getElementById('fin-top-produtos').innerHTML =
+      '<div class="fin-produto-row" style="justify-content:center;color:var(--gray-soft);">Nenhuma venda no período.</div>';
+    return;
+  }
+  document.getElementById('fin-top-produtos').innerHTML = sorted.map(([k,qty]) => {
+    const p = PRODUCTS[k];
+    const total_prod = qty * (p ? p.price : 0);
+    return `
+    <div class="fin-produto-row">
+      <div>
+        <div class="fin-produto-nome">${p ? p.name : k}</div>
+        <div class="fin-produto-sub">${qty} unidades vendidas</div>
+      </div>
+      <div class="fin-produto-val">${fmtR(total_prod)}</div>
+    </div>`;
+  }).join('');
+}
+
+function parseVendaDate(str) {
+  if (!str) return null;
+  const s = String(str).trim();
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+    const [d,m,y] = s.split('/');
+    return new Date(+y, +m-1, +d);
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y,m,d] = s.split('-');
+    return new Date(+y, +m-1, +d);
+  }
+  return null;
+}
+
+function fmtR(val) {
+  return 'R$ ' + (parseFloat(val)||0).toFixed(2).replace('.',',');
+}
+
+// ── FICHAS TÉCNICAS ──────────────────────────────────────
+function renderFichas(fichas) {
+  if (!fichas.length) {
+    document.getElementById('fichas-list').innerHTML =
+      '<div class="ficha-empty">Nenhuma ficha técnica encontrada.<br>Crie a aba <strong>Fichas_Tecnicas</strong> no Google Sheets.</div>';
+    return;
+  }
+
+  // Group by product
+  const byProd = {};
+  fichas.forEach(row => {
+    const p = row.produto || '—';
+    if (!byProd[p]) byProd[p] = { custo: 0, ings: [] };
+    byProd[p].custo += parseFloat(row.custo_proporcional) || 0;
+    byProd[p].ings.push(row);
+  });
+
+  document.getElementById('fichas-list').innerHTML = Object.entries(byProd).map(([prod, info]) => {
+    // Find product price
+    const pKey = Object.keys(PRODUCTS).find(k => PRODUCTS[k].name.toLowerCase().includes(prod.toLowerCase()));
+    const preco = pKey ? PRODUCTS[pKey].price : null;
+    const custo = info.custo;
+    const margem = preco ? ((preco - custo) / preco * 100) : null;
+    const margemClass = margem === null ? '' : margem >= 50 ? 'boa' : margem >= 30 ? 'ok' : 'ruim';
+    const margemLabel = margem !== null ? `${margem.toFixed(0)}% margem` : '';
+
+    const ingsHtml = info.ings.map(ing => `
+      <div class="ficha-ing-row">
+        <div>
+          <div class="ficha-ing-nome">${ing.ingrediente || '—'}</div>
+          <div class="ficha-ing-qty">${ing.qtd_usada_g ? ing.qtd_usada_g+'g' : ''}</div>
+        </div>
+        <div class="ficha-ing-custo">R$ ${(parseFloat(ing.custo_proporcional)||0).toFixed(3).replace('.',',')}</div>
+      </div>`).join('');
+
+    return `
+    <div class="ficha-card">
+      <div class="ficha-header" onclick="toggleFicha(this)">
+        <div>
+          <div class="ficha-produto">${prod}</div>
+          ${preco ? `<div style="font-size:11px;color:var(--gray-soft);">Venda: R$ ${preco},00</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;">
+          <div class="ficha-custo-total">R$ ${custo.toFixed(2).replace('.',',')}</div>
+          ${margemLabel ? `<span class="ficha-margem ${margemClass}">${margemLabel}</span>` : ''}
+        </div>
+      </div>
+      <div class="ficha-body">${ingsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleFicha(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// ── INSUMOS ──────────────────────────────────────────────
+let editingInsumo = null;
+
+function renderInsumos(insumos) {
+  if (!insumos.length) {
+    document.getElementById('insumos-list').innerHTML =
+      '<div class="ficha-empty">Nenhum insumo cadastrado.<br>Crie a aba <strong>Insumos</strong> no Google Sheets.</div>';
+    return;
+  }
+  document.getElementById('insumos-list').innerHTML = insumos.map((ins, i) => {
+    const custoG = parseFloat(ins.custo_g) || 0;
+    return `
+    <div class="ins-card" id="ins-row-${i}">
+      <div class="ins-info">
+        <div class="ins-nome">${ins.ingrediente || '—'}</div>
+        <div class="ins-preco">R$ ${(parseFloat(ins.preco_pago)||0).toFixed(2).replace('.',',')} / ${ins.qtd_embalagem_g || '?'}g</div>
+      </div>
+      <div class="ins-custo-g">${custoG.toFixed(4).replace('.',',')} R$/g</div>
+      <button class="ins-edit-btn" onclick="editarInsumo(${i})">✏️</button>
+    </div>
+    <div id="ins-edit-${i}" style="display:none;"></div>`;
+  }).join('');
+}
+
+function editarInsumo(i) {
+  const ins = (gerenteData.insumos || [])[i];
+  if (!ins) return;
+  const wrap = document.getElementById('ins-edit-'+i);
+  if (wrap.style.display !== 'none') { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  wrap.innerHTML = `
+    <div class="ins-edit-row">
+      <label>Ingrediente</label>
+      <input id="ie-nome-${i}" value="${ins.ingrediente||''}" placeholder="Nome do ingrediente">
+      <label>Preço Pago (R$)</label>
+      <input id="ie-preco-${i}" type="number" step="0.01" value="${ins.preco_pago||''}" placeholder="Ex: 8.50">
+      <label>Qtd da Embalagem (g)</label>
+      <input id="ie-qtd-${i}" type="number" step="1" value="${ins.qtd_embalagem_g||''}" placeholder="Ex: 395">
+      <label>Linha na planilha (não edite)</label>
+      <input id="ie-row-${i}" value="${ins.rowIndex||''}" readonly style="background:#eee;color:#aaa;">
+      <div class="ins-edit-btns">
+        <button class="ins-save-btn"   onclick="salvarInsumo(${i})">💾 Salvar</button>
+        <button class="ins-cancel-btn" onclick="document.getElementById('ins-edit-${i}').style.display='none'">Cancelar</button>
+      </div>
+    </div>`;
+}
+
+function abrirFormNovoInsumo() {
+  const form = document.getElementById('ins-novo-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  if (form.style.display === 'block') {
+    form.innerHTML = `
+      <div class="ins-edit-row" style="margin-bottom:14px;">
+        <label>Ingrediente</label>
+        <input id="ins-new-nome" placeholder="Ex: Chocolate meio amargo">
+        <label>Preço Pago (R$)</label>
+        <input id="ins-new-preco" type="number" step="0.01" placeholder="Ex: 12.90">
+        <label>Qtd da Embalagem (g)</label>
+        <input id="ins-new-qtd" type="number" step="1" placeholder="Ex: 1000">
+        <div class="ins-edit-btns">
+          <button class="ins-save-btn"   onclick="criarInsumo()">💾 Criar Insumo</button>
+          <button class="ins-cancel-btn" onclick="document.getElementById('ins-novo-form').style.display='none'">Cancelar</button>
+        </div>
+      </div>`;
+  }
+}
+
+function criarInsumo() {
+  const nome  = document.getElementById('ins-new-nome').value.trim();
+  const preco = parseFloat(document.getElementById('ins-new-preco').value) || 0;
+  const qtd   = parseFloat(document.getElementById('ins-new-qtd').value) || 0;
+  if (!nome || !preco || !qtd) { showToast('⚠️ Preencha todos os campos'); return; }
+  showToast('Salvando...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'salvar_insumo', ingrediente: nome, preco_pago: preco, qtd_embalagem_g: qtd })
+  }).then(() => {
+    showToast('✓ Insumo criado!');
+    document.getElementById('ins-novo-form').style.display = 'none';
+    gerenteData = null; loadGerente();
+  }).catch(() => showToast('⚠️ Erro ao salvar.'));
+}
+
+function salvarInsumo(i) {
+  const nome  = document.getElementById('ie-nome-'+i).value.trim();
+  const preco = parseFloat(document.getElementById('ie-preco-'+i).value) || 0;
+  const qtd   = parseFloat(document.getElementById('ie-qtd-'+i).value) || 0;
+  const row   = parseInt(document.getElementById('ie-row-'+i).value) || 0;
+  if (!nome || !preco || !qtd) { showToast('⚠️ Preencha todos os campos'); return; }
+  showToast('Salvando...');
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ tipo: 'salvar_insumo', ingrediente: nome, preco_pago: preco, qtd_embalagem_g: qtd, rowIndex: row })
+  }).then(() => {
+    showToast('✓ Insumo atualizado!');
+    document.getElementById('ins-edit-'+i).style.display = 'none';
+    gerenteData = null; loadGerente();
+  }).catch(() => showToast('⚠️ Erro ao salvar.'));
 }
 
 // ── TOAST ───────────────────────────────────────────────
