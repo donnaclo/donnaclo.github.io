@@ -1055,6 +1055,88 @@
   .ficha-margem.laranja { background: #FEF3E2; color: #B85C00; }
   .ficha-margem.vermelho { background: #FCECEA; color: var(--red-warn); }
 
+  /* ── PREVISÃO DE PRODUÇÃO ────────────────────────────── */
+  .prev-section-title {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--brown-light);
+    margin: 22px 0 10px;
+  }
+  .prev-hint {
+    font-size: 12px; color: var(--gray-soft); margin: -4px 0 12px; line-height: 1.5;
+  }
+
+  /* Alertas */
+  .alerta-card {
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .alerta-card.alerta-zerado {
+    background: #FCECEA; border: 1px solid rgba(176,48,32,0.25);
+  }
+  .alerta-card.alerta-critico {
+    background: #FEF3E2; border: 1px solid rgba(184,92,0,0.25);
+  }
+  .alerta-card.alerta-baixo {
+    background: #FEFCE8; border: 1px solid rgba(146,64,14,0.2);
+  }
+  .alerta-icon { font-size: 20px; flex-shrink: 0; line-height: 1; }
+  .alerta-info { flex: 1; min-width: 0; }
+  .alerta-nome { font-size: 14px; font-weight: 500; color: var(--brown-dark); }
+  .alerta-detalhe { font-size: 11px; color: var(--gray-soft); margin-top: 2px; }
+  .alerta-status {
+    font-size: 10px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.05em; flex-shrink: 0;
+  }
+  .alerta-status.zerado  { background: var(--red-warn); color: #fff; }
+  .alerta-status.critico { background: #B85C00; color: #fff; }
+  .alerta-status.baixo   { background: #92400E; color: #fff; opacity: 0.75; }
+
+  /* Cards de Previsão */
+  .prev-card {
+    background: var(--warm-white); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .prev-card.prev-impossivel {
+    background: rgba(252,236,234,0.5); border-color: rgba(176,48,32,0.15);
+    opacity: 0.8;
+  }
+  .prev-info { flex: 1; min-width: 0; }
+  .prev-nome { font-size: 14px; font-weight: 500; color: var(--brown-dark); }
+  .prev-bar-wrap {
+    height: 4px; background: var(--border); border-radius: 4px;
+    margin: 6px 0 4px; overflow: hidden;
+  }
+  .prev-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+  .prev-limitante { font-size: 11px; color: var(--gray-soft); }
+  .prev-limitante strong { color: var(--red-warn); }
+
+  .prev-contador {
+    flex-shrink: 0; display: flex; flex-direction: column;
+    align-items: center; min-width: 58px;
+  }
+  .prev-num {
+    font-family: 'Playfair Display', serif; font-size: 30px;
+    font-weight: 600; line-height: 1;
+  }
+  .prev-num.nivel-verde    { color: var(--green-ok); }
+  .prev-num.nivel-laranja  { color: #D97B20; }
+  .prev-num.nivel-vermelho { color: var(--red-warn); }
+  .prev-un {
+    font-size: 9px; color: var(--gray-soft); letter-spacing: 0.1em;
+    text-transform: uppercase; margin-top: 2px;
+  }
+
+  /* Insumo card com estoque */
+  .ins-estoque {
+    font-size: 12px; font-weight: 500; padding: 2px 9px;
+    border-radius: 20px; flex-shrink: 0; white-space: nowrap;
+  }
+  .ins-estoque.est-ok      { background: #EBF6EF; color: var(--green-ok); }
+  .ins-estoque.est-baixo   { background: #FEF3E2; color: #B85C00; }
+  .ins-estoque.est-zerado  { background: #FCECEA; color: var(--red-warn); }
+  .ins-estoque.est-nd      { background: var(--cream); color: var(--gray-soft); }
+
 </style>
 </head>
 <body>
@@ -1523,16 +1605,35 @@
 
   <!-- ── SUB: INSUMOS ──────────────────────────────────── -->
   <div id="gsub-page-insumos" class="gerente-subpage">
+
+    <!-- SEÇÃO A: Alertas de Estoque ────────────────────── -->
+    <div class="prev-section-title" style="margin-top:4px;">⚠️ Alertas de Estoque</div>
+    <div id="alertas-list">
+      <div class="gerente-loading"><div class="spinner"></div>Calculando...</div>
+    </div>
+
+    <!-- SEÇÃO B: Previsão de Produção ──────────────────── -->
+    <div class="prev-section-title">🔮 Previsão de Produção</div>
+    <p class="prev-hint">Com o estoque atual do armário, você consegue produzir:</p>
+    <div id="previsao-list">
+      <div class="gerente-loading"><div class="spinner"></div>Calculando...</div>
+    </div>
+
+    <!-- SEÇÃO C: Gestão de Insumos ─────────────────────── -->
+    <div class="prev-section-title">🍫 Gestão de Insumos</div>
     <button class="ins-add-btn" onclick="abrirFormNovoInsumo()">+ Novo Insumo</button>
     <div id="ins-novo-form" style="display:none;"></div>
     <div id="insumos-list">
       <div class="gerente-loading"><div class="spinner"></div>Carregando insumos...</div>
     </div>
-    <div style="margin-top:10px;font-size:12px;color:var(--gray-soft);line-height:1.6;text-align:center;">
-      💡 Crie a aba <strong>Insumos</strong> no Sheets com:<br>
-      <em>Ingrediente | Preco_Pago | Qtd_Embalagem_g | Custo_g</em><br>
-      A coluna Custo_g use a fórmula <code>=B2/C2</code>
+    <div style="margin-top:12px;font-size:12px;color:var(--gray-soft);line-height:1.7;text-align:center;">
+      💡 Para ativar a Previsão de Produção, adicione a coluna<br>
+      <strong>Estoque_Atual</strong> na aba <em>Insumos</em> do Google Sheets<br>
+      e insira o saldo físico de cada ingrediente.<br>
+      <span style="font-size:11px;opacity:0.8;">Exemplo de estrutura:<br>
+      <em>Ingrediente | Preco_Pago | Qtd_Embalagem_g | Custo_g | Estoque_Atual</em></span>
     </div>
+
   </div>
 
 </div>
@@ -1550,7 +1651,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuY2D5iJO0c9ifvnv6HxqKrczxr65Nz1kI7wIYlafd45AC3UnQknn7rkt4yII-If_T/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztNtepHQ2Nu9EoB-oWDk7bLGwazOYeEVxOwrvb-eC75B60xSAJCXI2Q4XNM3QskeVT/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -2751,7 +2852,10 @@ function switchGSub(sub) {
     document.getElementById('gsub-page-'+s).classList.toggle('active', s === sub);
   });
   if (sub === 'fichas'  && gerenteData) renderFichas(gerenteData.fichas || []);
-  if (sub === 'insumos' && gerenteData) renderInsumos(gerenteData.insumos || []);
+  if (sub === 'insumos') {
+    if (gerenteData) renderInsumos(gerenteData.insumos || []);
+    carregarPrevisaoProducao(); // sempre dados frescos da previsão
+  }
 }
 
 function loadGerente() {
@@ -3009,17 +3113,133 @@ function renderInsumos(insumos) {
     return;
   }
   document.getElementById('insumos-list').innerHTML = insumos.map((ins, i) => {
-    const custoG = parseFloat(ins.custo_g) || 0;
+    const custoG   = parseFloat(ins.custo_g) || 0;
+    const estoq    = ins.estoque_atual;
+    const temEstoq = estoq >= 0;
+
+    let estClass = 'est-nd', estLabel = 'N/D';
+    if (temEstoq) {
+      if (estoq === 0)       { estClass = 'est-zerado'; estLabel = 'Zerado'; }
+      else if (estoq < 200)  { estClass = 'est-baixo';  estLabel = estoq + 'g'; }
+      else                   { estClass = 'est-ok';      estLabel = estoq + 'g'; }
+    }
+
     return `
     <div class="ins-card" id="ins-row-${i}">
       <div class="ins-info">
         <div class="ins-nome">${ins.ingrediente || '—'}</div>
         <div class="ins-preco">R$ ${(parseFloat(ins.preco_pago)||0).toFixed(2).replace('.',',')} / ${ins.qtd_embalagem_g || '?'}g</div>
       </div>
+      <span class="ins-estoque ${estClass}">${estLabel}</span>
       <div class="ins-custo-g">${custoG.toFixed(4).replace('.',',')} R$/g</div>
       <button class="ins-edit-btn" onclick="editarInsumo(${i})">✏️</button>
     </div>
     <div id="ins-edit-${i}" style="display:none;"></div>`;
+  }).join('');
+}
+
+// ── PREVISÃO DE PRODUÇÃO ──────────────────────────────────
+// Sempre busca dados frescos (estoque muda fora do app, via planilha)
+function carregarPrevisaoProducao() {
+  const loadHtml = '<div class="gerente-loading"><div class="spinner"></div>Calculando...</div>';
+  document.getElementById('alertas-list').innerHTML  = loadHtml;
+  document.getElementById('previsao-list').innerHTML = loadHtml;
+
+  fetch(`${SCRIPT_URL}?action=previsao`)
+    .then(r => r.json())
+    .then(data => {
+      renderAlertas(data.alertas || []);
+      renderPrevisaoProducao(data.previsoes || [], data.aviso || null);
+    })
+    .catch(() => {
+      const err = '<div class="ficha-empty">⚠️ Erro ao calcular. Verifique a conexão.</div>';
+      document.getElementById('alertas-list').innerHTML  = err;
+      document.getElementById('previsao-list').innerHTML = '';
+    });
+}
+
+// ── Renderiza alertas de estoque baixo / zerado ───────────
+function renderAlertas(alertas) {
+  const el = document.getElementById('alertas-list');
+  if (!alertas.length) {
+    el.innerHTML = `
+      <div style="background:#EBF6EF;border:1px solid rgba(45,122,74,0.2);border-radius:12px;
+                  padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:20px;">✅</span>
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--brown-dark);">Estoque saudável</div>
+          <div style="font-size:11px;color:var(--gray-soft);margin-top:2px;">Nenhum ingrediente em nível crítico</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = alertas.map(a => {
+    const cls   = `alerta-${a.status}`;
+    const icone = a.status === 'zerado' ? '🔴' : a.status === 'critico' ? '🟠' : '🟡';
+    const txt   = a.status === 'zerado'  ? 'Acabou!'
+                : a.status === 'critico' ? 'Estoque crítico'
+                : 'Estoque baixo';
+    const det   = a.estoque_atual === 0
+                ? 'Repor imediatamente para retomar a produção.'
+                : `Apenas ${a.estoque_atual}g restantes — suficiente para poucos lotes.`;
+    return `
+    <div class="alerta-card ${cls}">
+      <span class="alerta-icon">${icone}</span>
+      <div class="alerta-info">
+        <div class="alerta-nome">${a.ingrediente}</div>
+        <div class="alerta-detalhe">${det}</div>
+      </div>
+      <span class="alerta-status ${a.status}">${txt}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Renderiza previsão de produção por produto ────────────
+function renderPrevisaoProducao(previsoes, aviso) {
+  const el = document.getElementById('previsao-list');
+  if (aviso) {
+    el.innerHTML = `<div class="ficha-empty">💡 ${aviso}</div>`;
+    return;
+  }
+  if (!previsoes.length) {
+    el.innerHTML = '<div class="ficha-empty">Nenhuma ficha técnica com estoque configurado encontrada.</div>';
+    return;
+  }
+
+  // Máximo para escalar a barra (cap: 60 unidades = 100%)
+  const MAX_BAR = 60;
+
+  el.innerHTML = previsoes.map(p => {
+    const qty  = p.max_producao;
+    const pct  = Math.min(qty / MAX_BAR * 100, 100).toFixed(0);
+    const nivel = qty === 0 ? 'vermelho' : qty < 10 ? 'laranja' : 'verde';
+    const cor   = nivel === 'verde'   ? 'var(--green-ok)'
+                : nivel === 'laranja' ? '#D97B20'
+                : 'var(--red-warn)';
+
+    const limitanteHtml = qty === 0 && p.limitante
+      ? `<div class="prev-limitante">🔴 Gargalo: <strong>${p.limitante}</strong></div>`
+      : qty < 10 && qty > 0 && p.limitante
+      ? `<div class="prev-limitante">🟠 Limitado por: <strong>${p.limitante}</strong></div>`
+      : '';
+
+    const impossivel = qty === 0 ? ' prev-impossivel' : '';
+
+    return `
+    <div class="prev-card${impossivel}">
+      <div class="prev-info">
+        <div class="prev-nome">${p.produto}</div>
+        <div class="prev-bar-wrap">
+          <div class="prev-bar-fill" style="width:${pct}%;background:${cor};"></div>
+        </div>
+        ${limitanteHtml}
+      </div>
+      <div class="prev-contador">
+        <div class="prev-num nivel-${nivel}">${qty}</div>
+        <div class="prev-un">unidades</div>
+      </div>
+    </div>`;
   }).join('');
 }
 
