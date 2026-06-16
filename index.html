@@ -1689,7 +1689,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwU-f6sVx2N82ZDvtjYZlHdNG32FWcuX4LsZma84ofUMBRKjD3nuwYsLbUsSf7yIoqQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEwbsifKPBfsetixfVGj_83czbCKNa4hwCidAO0xbdVF_GkD-k2sz9bs52mxa-wKgo/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1779,6 +1779,16 @@ function getOutroProduto() {
     desc: descEl ? descEl.value.trim() : '',
     price: precoEl ? parseMoneyInput(precoEl.value) : 0
   };
+}
+function buildEstoqueAfterDeduct(qtysObj) {
+  const next = { ...estoqueCache };
+  for (const key in qtysObj) {
+    if (qtysObj[key] > 0) {
+      const current = next[key] !== undefined ? (parseInt(next[key]) || 0) : 0;
+      next[key] = current - qtysObj[key];
+    }
+  }
+  return next;
 }
 function updateTotal() {
   let total = 0, parts = [];
@@ -1888,21 +1898,26 @@ function registrarVenda() {
   if (isReserva) {
     const payload = {
       tipo: 'reserva', data, cliente, empresa,
-      itens: itensList.join(', '), total: total.toFixed(2), obs
+      itens: itensList.join(', '), total: total.toFixed(2), obs,
+      estoque_after: buildEstoqueAfterDeduct(qtys)
     };
     for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
     if (!checkStockBeforeSubmit(qtys)) return;
     showToast('Salvando reserva...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('📄 Reserva registrada!'); deductFromEstoque({...qtys}); limparTudo(); })
+      .then(() => { showToast('📄 Reserva registrada!'); deductFromEstoque({...qtys}, false); limparTudo(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   } else {
-    const payload = { data, cliente, empresa, itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs };
+    const payload = {
+      tipo: 'venda', data, cliente, empresa,
+      itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs,
+      estoque_after: buildEstoqueAfterDeduct(qtys)
+    };
     for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
     if (!checkStockBeforeSubmit(qtys)) return;
     showToast('Enviando...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('✓ Venda registrada!'); deductFromEstoque({...qtys}); limparTudo(); })
+      .then(() => { showToast('✓ Venda registrada!'); deductFromEstoque({...qtys}, false); limparTudo(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   }
 }
@@ -2760,14 +2775,14 @@ function salvarEstoqueSilencioso() {
   }).catch(() => {});
 }
 
-function deductFromEstoque(qtysObj) {
+function deductFromEstoque(qtysObj, shouldSave = true) {
   for (const key in qtysObj) {
     if (qtysObj[key] > 0) {
       const current = estoqueCache[key] !== undefined ? (parseInt(estoqueCache[key]) || 0) : 0;
       estoqueCache[key] = current - qtysObj[key];
     }
   }
-  salvarEstoqueSilencioso();
+  if (shouldSave) salvarEstoqueSilencioso();
   renderStockBadgesOnVenda();
 }
 
