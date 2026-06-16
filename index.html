@@ -833,6 +833,35 @@
   .stock-badge.low  { background: #FEF3E2; color: #B85C00; }
   .stock-badge.ok   { background: #EBF6EF; color: var(--green-ok); }
 
+  .other-product-box {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .other-product-row {
+    display: grid;
+    grid-template-columns: 1fr 130px;
+    gap: 10px;
+  }
+  .other-product-box input {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--brown-dark);
+    outline: none;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  .other-product-box input:focus { border-color: var(--brown-light); }
+  @media (max-width: 420px) {
+    .other-product-row { grid-template-columns: 1fr; }
+  }
+
   /* ── GERENTE PAGE ────────────────────────────────────── */
   #page-gerente { padding-bottom: 40px; }
 
@@ -1239,6 +1268,7 @@
   <div class="product-row" id="row-limao"><div class="product-info"><div class="product-name">Limão</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('limao',-1)">−</button><span class="qty-display" id="qty-limao">0</span><button class="qty-btn" onclick="changeQty('limao',1)">+</button></div></div>
   <div class="product-row" id="row-cenoura_bb"><div class="product-info"><div class="product-name">Cenoura c/ Brig. Belga</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('cenoura_bb',-1)">−</button><span class="qty-display" id="qty-cenoura_bb">0</span><button class="qty-btn" onclick="changeQty('cenoura_bb',1)">+</button></div></div>
   <div class="product-row" id="row-ln_geleia"><div class="product-info"><div class="product-name">LN c/ Geleia de Morango</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('ln_geleia',-1)">−</button><span class="qty-display" id="qty-ln_geleia">0</span><button class="qty-btn" onclick="changeQty('ln_geleia',1)">+</button></div></div>
+  <div class="product-row" id="row-mineirinho"><div class="product-info"><div class="product-name">Mineirinho</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('mineirinho',-1)">−</button><span class="qty-display" id="qty-mineirinho">0</span><button class="qty-btn" onclick="changeQty('mineirinho',1)">+</button></div></div>
 
   <div class="cat-header">🍮 Sobremesas no Pote</div>
   <div class="product-row" id="row-morango_pote"><div class="product-info"><div class="product-name">Morango (pote)</div><div class="product-price">R$ 18,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('morango_pote',-1)">−</button><span class="qty-display" id="qty-morango_pote">0</span><button class="qty-btn" onclick="changeQty('morango_pote',1)">+</button></div></div>
@@ -1253,6 +1283,14 @@
   <div class="cat-header">🍰 Sobremesas Clássicas</div>
   <div class="product-row" id="row-torta_limao"><div class="product-info"><div class="product-name">Torta de Limão</div><div class="product-price">R$ 78,00 / kg</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('torta_limao',-1)">−</button><span class="qty-display" id="qty-torta_limao">0</span><button class="qty-btn" onclick="changeQty('torta_limao',1)">+</button></div></div>
   <div class="product-row" id="row-torta_banoffee"><div class="product-info"><div class="product-name">Torta Banoffee</div><div class="product-price">R$ 78,00 / kg</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('torta_banoffee',-1)">−</button><span class="qty-display" id="qty-torta_banoffee">0</span><button class="qty-btn" onclick="changeQty('torta_banoffee',1)">+</button></div></div>
+
+  <p class="section-label">Outros</p>
+  <div class="other-product-box">
+    <div class="other-product-row">
+      <input type="text" id="outro-produto-desc" placeholder="Ex: bolo de banana 5Kg" autocomplete="off" oninput="updateTotal()">
+      <input type="text" id="outro-produto-preco" placeholder="Preço R$" inputmode="decimal" oninput="updateTotal()">
+    </div>
+  </div>
 
   <p class="section-label">Observações</p>
   <div class="obs-field">
@@ -1651,7 +1689,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztNtepHQ2Nu9EoB-oWDk7bLGwazOYeEVxOwrvb-eC75B60xSAJCXI2Q4XNM3QskeVT/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwU-f6sVx2N82ZDvtjYZlHdNG32FWcuX4LsZma84ofUMBRKjD3nuwYsLbUsSf7yIoqQ/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1671,6 +1709,7 @@ const PRODUCTS = {
   limao:             { name: 'Limão',                   price: 15 },
   cenoura_bb:        { name: 'Cenoura c/ Brig. Belga', price: 15 },
   ln_geleia:         { name: 'LN c/ Geleia Morango',   price: 15 },
+  mineirinho:        { name: 'Mineirinho',              price: 15 },
   morango_pote:      { name: 'Morango (pote)',           price: 18 },
   abacaxi_coco:      { name: 'Abacaxi c/ Coco (pote)', price: 18 },
   morangoffee:       { name: 'Morangoffee',             price: 18 },
@@ -1730,6 +1769,17 @@ function changeQty(id, delta) {
   document.getElementById('row-'+id).classList.toggle('active', qtys[id] > 0);
   updateTotal();
 }
+function parseMoneyInput(val) {
+  return parseFloat(String(val || '').replace(',', '.')) || 0;
+}
+function getOutroProduto() {
+  const descEl = document.getElementById('outro-produto-desc');
+  const precoEl = document.getElementById('outro-produto-preco');
+  return {
+    desc: descEl ? descEl.value.trim() : '',
+    price: precoEl ? parseMoneyInput(precoEl.value) : 0
+  };
+}
 function updateTotal() {
   let total = 0, parts = [];
   for (const k in PRODUCTS) {
@@ -1737,6 +1787,11 @@ function updateTotal() {
       total += qtys[k] * PRODUCTS[k].price;
       parts.push(qtys[k]+'× '+PRODUCTS[k].name.split('(')[0].trim());
     }
+  }
+  const outro = getOutroProduto();
+  if (outro.desc || outro.price > 0) {
+    total += outro.price;
+    parts.push(outro.desc ? `Outros: ${outro.desc}` : 'Outros');
   }
   document.getElementById('total-display').textContent = 'R$ '+total.toFixed(2).replace('.',',');
   document.getElementById('items-summary').textContent = parts.join(' · ');
@@ -1765,6 +1820,8 @@ function limparTudo() {
   }
   document.getElementById('cliente').value = '';
   document.getElementById('obs').value = '';
+  document.getElementById('outro-produto-desc').value = '';
+  document.getElementById('outro-produto-preco').value = '';
   // reset reserva
   document.getElementById('is-reserva').value = '0';
   document.getElementById('btn-reserva').classList.remove('selected');
@@ -1814,6 +1871,15 @@ function registrarVenda() {
   let total = 0;
   for (const k in PRODUCTS) {
     if (qtys[k] > 0) { itensList.push(qtys[k]+'x '+PRODUCTS[k].name); total += qtys[k]*PRODUCTS[k].price; }
+  }
+  const outro = getOutroProduto();
+  if ((outro.desc && outro.price <= 0) || (!outro.desc && outro.price > 0)) {
+    showToast('⚠️ Preencha descricao e preco em Outros');
+    return;
+  }
+  if (outro.desc && outro.price > 0) {
+    itensList.push('1x ' + outro.desc);
+    total += outro.price;
   }
   if (!itensList.length) { showToast('⚠️ Adicione pelo menos 1 produto'); return; }
 
@@ -2618,7 +2684,8 @@ function renderEstoque() {
     let rowClass = '';
     let badgeClass = '';
     let badgeLabel = '';
-    if (qty === 0)     { out++;  rowClass = 'out';    badgeClass = 'out';    badgeLabel = '⛔ Zerado'; }
+    if (qty < 0)       { out++;  rowClass = 'out';    badgeClass = 'out';    badgeLabel = `Falta ${Math.abs(qty)} un.`; }
+    else if (qty === 0){ out++;  rowClass = 'out';    badgeClass = 'out';    badgeLabel = '⛔ Zerado'; }
     else if (qty <= 2) { low++;  rowClass = 'low';    badgeClass = 'low';    badgeLabel = '⚠️ Baixo'; }
     else               { ok++;   rowClass = 'plenty'; badgeClass = 'plenty'; badgeLabel = `✓ ${qty} un.`; }
 
@@ -2632,7 +2699,7 @@ function renderEstoque() {
       <div class="est-qty-wrap">
         <button class="est-qbtn" onclick="adjustEst('${key}',-1)">−</button>
         <input class="est-input" type="number" id="est-qty-${key}"
-               value="${qty}" min="0" max="999"
+               value="${qty}" min="-999" max="999"
                onchange="onEstChange('${key}',this.value)">
         <button class="est-qbtn" onclick="adjustEst('${key}',1)">+</button>
       </div>
@@ -2647,25 +2714,26 @@ function renderEstoque() {
 
 function adjustEst(key, delta) {
   const input = document.getElementById('est-qty-'+key);
-  const newVal = Math.max(0, (parseInt(input.value)||0) + delta);
+  const newVal = (parseInt(input.value)||0) + delta;
   input.value = newVal;
   onEstChange(key, newVal);
 }
 
 function onEstChange(key, val) {
-  estoqueCache[key] = Math.max(0, parseInt(val)||0);
+  estoqueCache[key] = parseInt(val)||0;
   const qty = estoqueCache[key];
   const row = document.getElementById('erow-'+key);
   row.classList.remove('out','low','plenty');
   const badge = row.querySelector('.est-stock-indicator');
   badge.classList.remove('out','low','plenty');
-  if (qty === 0)     { row.classList.add('out');    badge.classList.add('out');    badge.textContent = '⛔ Zerado'; }
+  if (qty < 0)       { row.classList.add('out');    badge.classList.add('out');    badge.textContent = `Falta ${Math.abs(qty)} un.`; }
+  else if (qty === 0){ row.classList.add('out');    badge.classList.add('out');    badge.textContent = '⛔ Zerado'; }
   else if (qty <= 2) { row.classList.add('low');    badge.classList.add('low');    badge.textContent = '⚠️ Baixo'; }
   else               { row.classList.add('plenty'); badge.classList.add('plenty'); badge.textContent = `✓ ${qty} un.`; }
   let ok=0,low=0,out=0;
   for (const k in PRODUCTS) {
     const q = estoqueCache[k]||0;
-    if (q===0) out++; else if (q<=2) low++; else ok++;
+    if (q<=0) out++; else if (q<=2) low++; else ok++;
   }
   document.getElementById('est-stat-ok').textContent  = ok;
   document.getElementById('est-stat-low').textContent = low;
@@ -2694,8 +2762,9 @@ function salvarEstoqueSilencioso() {
 
 function deductFromEstoque(qtysObj) {
   for (const key in qtysObj) {
-    if (qtysObj[key] > 0 && estoqueCache[key] !== undefined) {
-      estoqueCache[key] = Math.max(0, (estoqueCache[key]||0) - qtysObj[key]);
+    if (qtysObj[key] > 0) {
+      const current = estoqueCache[key] !== undefined ? (parseInt(estoqueCache[key]) || 0) : 0;
+      estoqueCache[key] = current - qtysObj[key];
     }
   }
   salvarEstoqueSilencioso();
@@ -2727,6 +2796,7 @@ const RESERVA_ALIASES = {
   'cenoura com brigadeiro belga': 'cenoura_bb',
   'ln c geleia morango': 'ln_geleia',
   'ln com geleia de morango': 'ln_geleia',
+  'mineirinho': 'mineirinho',
   'morango pote': 'morango_pote',
   'abacaxi c coco pote': 'abacaxi_coco',
   'abacaxi com coco pote': 'abacaxi_coco',
@@ -2816,27 +2886,13 @@ function renderStockBadgesOnVenda() {
     const qty = estoqueCache[key] !== undefined ? estoqueCache[key] : null;
     if (qty === null) continue;
     const badge = document.createElement('span');
-    badge.className = 'stock-badge ' + (qty === 0 ? 'out' : qty <= 2 ? 'low' : 'ok');
-    badge.textContent = qty === 0 ? '⛔ 0' : qty <= 2 ? `⚠️ ${qty}` : `${qty}`;
+    badge.className = 'stock-badge ' + (qty <= 0 ? 'out' : qty <= 2 ? 'low' : 'ok');
+    badge.textContent = qty <= 0 ? `${qty}` : qty <= 2 ? `⚠️ ${qty}` : `${qty}`;
     nameEl.appendChild(badge);
   }
 }
 
 function checkStockBeforeSubmit(qtysObj) {
-  if (!estoqueLoaded) return true;
-  const problems = [];
-  for (const key in qtysObj) {
-    if (qtysObj[key] > 0) {
-      const avail = estoqueCache[key] !== undefined ? estoqueCache[key] : 999;
-      if (qtysObj[key] > avail) {
-        problems.push(`${PRODUCTS[key].name}: pedido ${qtysObj[key]}, estoque ${avail}`);
-      }
-    }
-  }
-  if (problems.length > 0) {
-    showToast('⚠️ Estoque insuficiente: ' + problems[0]);
-    return false;
-  }
   return true;
 }
 
