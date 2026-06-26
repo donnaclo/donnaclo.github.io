@@ -1256,6 +1256,14 @@
   <div class="product-row" id="row-bombolacha"><div class="product-info"><div class="product-name">Bombolacha</div><div class="product-price">R$ 8,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('bombolacha',-1)">−</button><span class="qty-display" id="qty-bombolacha">0</span><button class="qty-btn" onclick="changeQty('bombolacha',1)">+</button></div></div>
   <div class="product-row" id="row-biscoito_amendoim"><div class="product-info"><div class="product-name">Biscoito de Amendoim</div><div class="product-price">R$ 10,00 / pacote</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('biscoito_amendoim',-1)">−</button><span class="qty-display" id="qty-biscoito_amendoim">0</span><button class="qty-btn" onclick="changeQty('biscoito_amendoim',1)">+</button></div></div>
 
+  <div class="cat-header">Produtos Vera</div>
+  <div class="product-row" id="row-vera_cookie_recheado"><div class="product-info"><div class="product-name">Cookie recheado</div><div class="product-price">R$ 12,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_cookie_recheado',-1)">−</button><span class="qty-display" id="qty-vera_cookie_recheado">0</span><button class="qty-btn" onclick="changeQty('vera_cookie_recheado',1)">+</button></div></div>
+  <div class="product-row" id="row-vera_cookie_tradicional"><div class="product-info"><div class="product-name">Cookie tradicional</div><div class="product-price">R$ 7,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_cookie_tradicional',-1)">−</button><span class="qty-display" id="qty-vera_cookie_tradicional">0</span><button class="qty-btn" onclick="changeQty('vera_cookie_tradicional',1)">+</button></div></div>
+  <div class="product-row" id="row-vera_casadinho_goiaba"><div class="product-info"><div class="product-name">Casadinho de goiaba</div><div class="product-price">R$ 12,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_casadinho_goiaba',-1)">−</button><span class="qty-display" id="qty-vera_casadinho_goiaba">0</span><button class="qty-btn" onclick="changeQty('vera_casadinho_goiaba',1)">+</button></div></div>
+  <div class="product-row" id="row-vera_pao_integral"><div class="product-info"><div class="product-name">Pão integral</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_pao_integral',-1)">−</button><span class="qty-display" id="qty-vera_pao_integral">0</span><button class="qty-btn" onclick="changeQty('vera_pao_integral',1)">+</button></div></div>
+  <div class="product-row" id="row-vera_cuca"><div class="product-info"><div class="product-name">Cuca</div><div class="product-price">R$ 18,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_cuca',-1)">−</button><span class="qty-display" id="qty-vera_cuca">0</span><button class="qty-btn" onclick="changeQty('vera_cuca',1)">+</button></div></div>
+  <div class="product-row" id="row-vera_pao_calabresa"><div class="product-info"><div class="product-name">Pão de Calabresa</div><div class="product-price">R$ 18,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('vera_pao_calabresa',-1)">−</button><span class="qty-display" id="qty-vera_pao_calabresa">0</span><button class="qty-btn" onclick="changeQty('vera_pao_calabresa',1)">+</button></div></div>
+
   <div class="cat-header">🎂 Bolos no Pote — R$ 15,00</div>
   <div class="product-row" id="row-bb"><div class="product-info"><div class="product-name">Brigadeiro Belga (BB)</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('bb',-1)">−</button><span class="qty-display" id="qty-bb">0</span><button class="qty-btn" onclick="changeQty('bb',1)">+</button></div></div>
   <div class="product-row" id="row-ln"><div class="product-info"><div class="product-name">Leite Ninho (LN)</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('ln',-1)">−</button><span class="qty-display" id="qty-ln">0</span><button class="qty-btn" onclick="changeQty('ln',1)">+</button></div></div>
@@ -1689,7 +1697,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEwbsifKPBfsetixfVGj_83czbCKNa4hwCidAO0xbdVF_GkD-k2sz9bs52mxa-wKgo/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAS6sPFcneIoegrbtgt4RZuoF3lbBvzghr5D508pJCbrEF70EMQW52NuVukHswMpXQ/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1698,6 +1706,12 @@ const PRODUCTS = {
   queijadinha:       { name: 'Queijadinha',             price: 8  },
   bombolacha:        { name: 'Bombolacha',              price: 8  },
   biscoito_amendoim: { name: 'Biscoito de Amendoim',    price: 10 },
+  vera_cookie_recheado:    { name: 'Cookie recheado',        price: 12, owner: 'vera' },
+  vera_cookie_tradicional: { name: 'Cookie tradicional',     price: 7,  owner: 'vera' },
+  vera_casadinho_goiaba:   { name: 'Casadinho de goiaba',   price: 12, owner: 'vera' },
+  vera_pao_integral:       { name: 'Pão integral',          price: 15, owner: 'vera' },
+  vera_cuca:               { name: 'Cuca',                  price: 18, owner: 'vera' },
+  vera_pao_calabresa:      { name: 'Pão de Calabresa',      price: 18, owner: 'vera' },
   bb:                { name: 'BB (Brigadeiro Belga)',   price: 15 },
   ln:                { name: 'LN (Leite Ninho)',        price: 15 },
   beij:              { name: 'Beijinho',                price: 15 },
@@ -1780,15 +1794,44 @@ function getOutroProduto() {
     price: precoEl ? parseMoneyInput(precoEl.value) : 0
   };
 }
-function buildEstoqueAfterDeduct(qtysObj) {
-  const next = { ...estoqueCache };
-  for (const key in qtysObj) {
-    if (qtysObj[key] > 0) {
-      const current = next[key] !== undefined ? (parseInt(next[key]) || 0) : 0;
-      next[key] = current - qtysObj[key];
-    }
+const OWNER_LABELS = {
+  donna: 'Donna Clo',
+  vera: 'Vera'
+};
+function productOwner(key) {
+  return PRODUCTS[key] && PRODUCTS[key].owner ? PRODUCTS[key].owner : 'donna';
+}
+function obsWithOwner(owner, obs) {
+  const label = OWNER_LABELS[owner] || owner;
+  return obs ? `${label} - ${obs}` : label;
+}
+function buildSaleGroups(obs) {
+  const groups = {};
+
+  for (const k in PRODUCTS) {
+    if (qtys[k] <= 0) continue;
+    const owner = productOwner(k);
+    if (!groups[owner]) groups[owner] = { owner, itensList: [], total: 0, qtys: {} };
+    groups[owner].itensList.push(qtys[k] + 'x ' + PRODUCTS[k].name);
+    groups[owner].total += qtys[k] * PRODUCTS[k].price;
+    groups[owner].qtys[k] = qtys[k];
   }
-  return next;
+
+  const outro = getOutroProduto();
+  if (outro.desc && outro.price > 0) {
+    const owner = 'donna';
+    if (!groups[owner]) groups[owner] = { owner, itensList: [], total: 0, qtys: {} };
+    groups[owner].itensList.push('1x ' + outro.desc);
+    groups[owner].total += outro.price;
+  }
+
+  return Object.values(groups).map(g => ({
+    owner: g.owner,
+    itens: g.itensList.join(', '),
+    total: g.total.toFixed(2),
+    obs: obsWithOwner(g.owner, obs),
+    qtys: g.qtys
+  }));
 }
 function updateTotal() {
   let total = 0, parts = [];
@@ -1877,47 +1920,57 @@ function registrarVenda() {
       return;
     }
   }
-  const itensList = [];
-  let total = 0;
-  for (const k in PRODUCTS) {
-    if (qtys[k] > 0) { itensList.push(qtys[k]+'x '+PRODUCTS[k].name); total += qtys[k]*PRODUCTS[k].price; }
-  }
   const outro = getOutroProduto();
   if ((outro.desc && outro.price <= 0) || (!outro.desc && outro.price > 0)) {
     showToast('⚠️ Preencha descricao e preco em Outros');
     return;
   }
-  if (outro.desc && outro.price > 0) {
-    itensList.push('1x ' + outro.desc);
-    total += outro.price;
-  }
-  if (!itensList.length) { showToast('⚠️ Adicione pelo menos 1 produto'); return; }
+  const saleGroups = buildSaleGroups(obs);
+  if (!saleGroups.length) { showToast('⚠️ Adicione pelo menos 1 produto'); return; }
 
   const isReserva = document.getElementById('is-reserva').value === '1';
 
   if (isReserva) {
-    const payload = {
-      tipo: 'reserva', data, cliente, empresa,
-      itens: itensList.join(', '), total: total.toFixed(2), obs,
-      estoque_after: buildEstoqueAfterDeduct(qtys)
-    };
-    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    let payload;
+    if (saleGroups.length === 1) {
+      const g = saleGroups[0];
+      payload = { tipo: 'reserva', data, cliente, empresa, itens: g.itens, total: g.total, obs: g.obs };
+      for (const k in PRODUCTS) payload['qty_'+k] = g.qtys[k] || 0;
+    } else {
+      payload = {
+        tipo: 'reservas_divididas',
+        reservas: saleGroups.map(g => {
+        const reserva = { data, cliente, empresa, itens: g.itens, total: g.total, obs: g.obs };
+        for (const k in PRODUCTS) reserva['qty_'+k] = g.qtys[k] || 0;
+        return reserva;
+        })
+      };
+    }
     if (!checkStockBeforeSubmit(qtys)) return;
-    showToast('Salvando reserva...');
+    showToast(saleGroups.length > 1 ? 'Salvando reservas separadas...' : 'Salvando reserva...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('📄 Reserva registrada!'); deductFromEstoque({...qtys}, false); limparTudo(); })
+      .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); loadEstoque(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   } else {
-    const payload = {
-      tipo: 'venda', data, cliente, empresa,
-      itens: itensList.join(', '), total: total.toFixed(2), pagamento, obs,
-      estoque_after: buildEstoqueAfterDeduct(qtys)
-    };
-    for (const k in PRODUCTS) payload['qty_'+k] = qtys[k];
+    let payload;
+    if (saleGroups.length === 1) {
+      const g = saleGroups[0];
+      payload = { tipo: 'venda', data, cliente, empresa, itens: g.itens, total: g.total, pagamento, obs: g.obs };
+      for (const k in PRODUCTS) payload['qty_'+k] = g.qtys[k] || 0;
+    } else {
+      payload = {
+        tipo: 'vendas_divididas',
+        vendas: saleGroups.map(g => {
+        const venda = { data, cliente, empresa, itens: g.itens, total: g.total, pagamento, obs: g.obs };
+        for (const k in PRODUCTS) venda['qty_'+k] = g.qtys[k] || 0;
+        return venda;
+        })
+      };
+    }
     if (!checkStockBeforeSubmit(qtys)) return;
-    showToast('Enviando...');
+    showToast(saleGroups.length > 1 ? 'Enviando vendas separadas...' : 'Enviando...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('✓ Venda registrada!'); deductFromEstoque({...qtys}, false); limparTudo(); })
+      .then(() => { showToast('✓ Venda registrada!'); limparTudo(); loadEstoque(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   }
 }
@@ -2646,10 +2699,6 @@ function apagarReserva(id) {
   const res = resAll.find(r => r.id === id);
   if (!res) { showToast('⚠️ Reserva não encontrada'); return; }
 
-  if ((res.status || 'reserva').toLowerCase() !== 'vendida') {
-    restoreToEstoque(extractQtysFromReserva(res));
-  }
-
   showToast('Apagando reserva...');
   fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
@@ -2660,6 +2709,7 @@ function apagarReserva(id) {
     showToast('✓ Reserva apagada!');
     resAll = resAll.filter(r => r.id !== id);
     renderResCards(resAll);
+    loadEstoque();
   })
   .catch(() => showToast('⚠️ Erro ao apagar.'));
 }
@@ -2761,7 +2811,7 @@ function salvarEstoque() {
   fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ tipo: 'salvar_estoque', estoque: estoqueCache })
+    body: JSON.stringify({ tipo: 'salvar_estoque', origem: 'estoque_manual', estoque: estoqueCache })
   })
   .then(() => showToast('✓ Estoque salvo!'))
   .catch(() => showToast('⚠️ Erro ao salvar estoque.'));
