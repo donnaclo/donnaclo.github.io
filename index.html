@@ -1865,16 +1865,21 @@ function selectEmpresa(val) {
     document.getElementById('empresa-outro').value = '';
   }
 }
-function limparTudo() {
+function limparItensDoPedido() {
   for (const k in qtys) {
     qtys[k] = 0;
     document.getElementById('qty-'+k).textContent = '0';
     document.getElementById('row-'+k).classList.remove('active');
   }
-  document.getElementById('cliente').value = '';
   document.getElementById('obs').value = '';
   document.getElementById('outro-produto-desc').value = '';
   document.getElementById('outro-produto-preco').value = '';
+}
+function limparTudo() {
+  limparItensDoPedido();
+  document.getElementById('cliente').value = '';
+  selectEmpresa('Outro');
+  document.getElementById('empresa-outro').value = '';
   // reset reserva
   document.getElementById('is-reserva').value = '0';
   document.getElementById('btn-reserva').classList.remove('selected');
@@ -1884,6 +1889,16 @@ function limparTudo() {
   selectPayment('Pago');
   updateTotal();
   showToast('Formulário limpo ✓');
+}
+function limparDepoisRegistro() {
+  limparItensDoPedido();
+  document.getElementById('is-reserva').value = '0';
+  document.getElementById('btn-reserva').classList.remove('selected');
+  document.getElementById('btn-reserva').textContent = '📄 Registrar como Reserva';
+  document.getElementById('modo-indicator').className = 'venda-mode-indicator modo-venda';
+  document.getElementById('modo-indicator').textContent = '✅ Modo: Venda Normal';
+  selectPayment('Pago');
+  updateTotal();
 }
 
 function toggleReserva() {
@@ -1949,7 +1964,7 @@ function registrarVenda() {
     if (!checkStockBeforeSubmit(qtys)) return;
     showToast(saleGroups.length > 1 ? 'Salvando reservas separadas...' : 'Salvando reserva...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('📄 Reserva registrada!'); limparTudo(); loadEstoque(); })
+      .then(() => { showToast('📄 Reserva registrada!'); limparDepoisRegistro(); loadEstoque(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   } else {
     let payload;
@@ -1970,7 +1985,7 @@ function registrarVenda() {
     if (!checkStockBeforeSubmit(qtys)) return;
     showToast(saleGroups.length > 1 ? 'Enviando vendas separadas...' : 'Enviando...');
     fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) })
-      .then(() => { showToast('✓ Venda registrada!'); limparTudo(); loadEstoque(); })
+      .then(() => { showToast('✓ Venda registrada!'); limparDepoisRegistro(); loadEstoque(); })
       .catch(() => showToast('⚠️ Erro ao enviar.'));
   }
 }
