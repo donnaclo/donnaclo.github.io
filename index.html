@@ -459,6 +459,61 @@
   }
 
   /* ── TOAST ───────────────────────────────────────────── */
+  .charge-panel {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .charge-mode-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .charge-mode-btn {
+    flex: 1; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--warm-white); color: var(--gray-soft);
+    padding: 11px 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .charge-mode-btn.active { background: #F6ECDE; border-color: var(--brown-light); color: var(--brown-mid); }
+  .charge-date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .charge-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .charge-actions .btn-buscar, .charge-actions .btn-limpar-busca { justify-content: center; }
+  .charge-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .charge-list { display: flex; flex-direction: column; gap: 12px; }
+  .charge-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .charge-card-head {
+    padding: 13px 14px; background: #FFFAF4; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; gap: 12px; align-items: flex-start;
+  }
+  .charge-client { font-size: 15px; font-weight: 700; color: var(--brown-dark); }
+  .charge-meta { font-size: 11px; color: var(--gray-soft); margin-top: 3px; line-height: 1.4; }
+  .charge-total { text-align: right; color: var(--red-warn); font-weight: 800; white-space: nowrap; }
+  .charge-body { padding: 12px 14px; }
+  .charge-buy {
+    display: grid; grid-template-columns: 74px 1fr auto; gap: 8px; padding: 8px 0;
+    border-bottom: 1px solid rgba(122,62,16,0.1); font-size: 12px; align-items: start;
+  }
+  .charge-buy:last-child { border-bottom: none; }
+  .charge-buy-date { color: var(--gray-soft); }
+  .charge-buy-itens { color: var(--brown-dark); line-height: 1.35; word-break: break-word; }
+  .charge-buy-total { color: var(--brown-mid); font-weight: 700; white-space: nowrap; }
+  .charge-card-actions { padding: 0 14px 14px; }
+  .charge-pdf-result {
+    background: #EBF6EF; border: 1px solid rgba(45,122,74,0.2);
+    border-radius: 12px; padding: 12px 14px; margin: 12px 0 16px; display: none;
+  }
+  .charge-pdf-result a {
+    display: inline-block; margin-top: 8px; background: var(--green-ok); color: white;
+    text-decoration: none; border-radius: 10px; padding: 9px 12px; font-size: 13px; font-weight: 700;
+  }
+  .consulta-pdf-wrap { display: none; margin: -8px 0 18px; }
+  @media (max-width: 460px) {
+    .charge-kpis { grid-template-columns: 1fr; }
+    .charge-date-grid { grid-template-columns: 1fr; }
+    .charge-actions { flex-direction: column; }
+    .charge-buy { grid-template-columns: 1fr; gap: 3px; }
+    .charge-buy-total { text-align: left; }
+  }
+
   .toast {
     position: fixed; top: 80px; left: 50%;
     transform: translateX(-50%) translateY(-10px);
@@ -1180,6 +1235,9 @@
     <button class="tab-btn" id="tab-consulta"   onclick="switchTab('consulta')">
       <span class="tab-emoji">🔍</span><span class="tab-label">Clientes</span>
     </button>
+    <button class="tab-btn" id="tab-cobrancas"  onclick="switchTab('cobrancas')">
+      <span class="tab-emoji">💬</span><span class="tab-label">Cobranças</span>
+    </button>
     <button class="tab-btn" id="tab-encomendas" onclick="switchTab('encomendas')">
       <span class="tab-emoji">📦</span><span class="tab-label">Encomendas</span>
     </button>
@@ -1358,6 +1416,13 @@
     </div>
   </div>
 
+  <div class="consulta-pdf-wrap" id="consulta-pdf-wrap">
+    <button class="btn-buscar" type="button" onclick="gerarPdfConsultaCliente()" style="width:100%;justify-content:center;">
+      💬 Gerar PDF de cobrança
+    </button>
+    <div class="charge-pdf-result" id="consulta-pdf-result"></div>
+  </div>
+
   <!-- PENDENTES -->
   <div class="history-section" id="section-pendentes" style="display:none;">
     <div class="history-header">
@@ -1387,6 +1452,73 @@
 <!-- ═══════════════════════════════════════════════════════
      PAGE: ENCOMENDAS
 ════════════════════════════════════════════════════════ -->
+<div id="page-cobrancas" class="page">
+<div class="container">
+
+  <p class="section-label" style="margin-top:4px;">Cobranças e Pendências</p>
+
+  <div class="charge-panel">
+    <div class="charge-mode-toggle">
+      <button class="charge-mode-btn active" id="cob-mode-empresa" type="button" onclick="setCobrancaModo('empresa')">Por empresa</button>
+      <button class="charge-mode-btn" id="cob-mode-cliente" type="button" onclick="setCobrancaModo('cliente')">Por cliente</button>
+    </div>
+
+    <div class="field" style="margin-bottom:0;">
+      <label id="cob-busca-label">Empresa</label>
+      <input type="text" id="cob-busca" class="search-input" placeholder="Ex: Vital, DFR..." autocomplete="off" onkeydown="if(event.key==='Enter') consultarPendencias()">
+    </div>
+
+    <div class="charge-date-grid">
+      <div class="field" style="margin-bottom:0;">
+        <label>Data inicial</label>
+        <input type="date" id="cob-inicio">
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label>Data final</label>
+        <input type="date" id="cob-fim">
+      </div>
+    </div>
+
+    <div class="charge-actions">
+      <button class="btn-buscar" type="button" onclick="consultarPendencias()" style="flex:2;">Consultar pendências</button>
+      <button class="btn-limpar-busca" type="button" onclick="limparCobrancas()">Limpar</button>
+    </div>
+  </div>
+
+  <div class="charge-kpis">
+    <div class="kpi-card">
+      <div class="kpi-label">Clientes com pendência</div>
+      <div class="kpi-value" id="cob-kpi-clientes">0</div>
+      <div class="kpi-sub">Agrupados por cliente e empresa</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pedidos pendentes</div>
+      <div class="kpi-value" id="cob-kpi-pedidos">0</div>
+      <div class="kpi-sub">Somente pagamento pendente</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total em aberto</div>
+      <div class="kpi-value red" id="cob-kpi-total">R$ 0,00</div>
+      <div class="kpi-sub">No filtro atual</div>
+    </div>
+  </div>
+
+  <div class="charge-pdf-result" id="cob-pdf-result"></div>
+
+  <div class="charge-actions" id="cob-geral-actions" style="display:none;margin-bottom:14px;">
+    <button class="btn-submit" type="button" onclick="gerarPdfPendenciasGeral()">Gerar PDF geral</button>
+  </div>
+
+  <div id="cob-lista" class="charge-list">
+    <div class="empty-state">
+      <div class="empty-icon">💬</div>
+      Consulte uma empresa ou cliente para ver pendências.
+    </div>
+  </div>
+
+</div><!-- .container -->
+</div><!-- #page-cobrancas -->
+
 <div id="page-encomendas" class="page">
 <div class="container">
 
@@ -1697,7 +1829,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAS6sPFcneIoegrbtgt4RZuoF3lbBvzghr5D508pJCbrEF70EMQW52NuVukHswMpXQ/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZUi3wlEQF2Fn-pwLH3krTA6Vp1wqlu_kJmzyQWfISXgIrK74NZewv8IVC0WCgrTgt/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1740,6 +1872,8 @@ let consultaAtual = null;
 let consultaBase = null;
 let consultaChoices = [];
 let allClientes = [];
+let cobrancaModo = 'empresa';
+let cobrancasData = null;
 
 // ── ENCOMENDAS STATE ─────────────────────────────────────
 let encFilter = 'todos';
@@ -1765,7 +1899,7 @@ window.onload = () => {
 
 // ── TABS ────────────────────────────────────────────────
 function switchTab(tab) {
-  ['venda','consulta','encomendas','reservas','estoque','gerente'].forEach(t => {
+  ['venda','consulta','cobrancas','encomendas','reservas','estoque','gerente'].forEach(t => {
     document.getElementById('page-'+t).classList.toggle('active', t === tab);
     document.getElementById('tab-'+t).classList.toggle('active', t === tab);
   });
@@ -2136,6 +2270,8 @@ function executarBuscaCliente(nome) {
   document.getElementById('list-historico').innerHTML =
     '<div class="loading-state"><div class="spinner"></div>Buscando dados...</div>';
   document.getElementById('section-pendentes').style.display = 'none';
+  document.getElementById('consulta-pdf-wrap').style.display = 'none';
+  document.getElementById('consulta-pdf-result').style.display = 'none';
 
   const url = `${SCRIPT_URL}?action=consulta&cliente=${encodeURIComponent(nome)}`;
 
@@ -2224,6 +2360,7 @@ function processConsultaResultado(data) {
     document.getElementById('list-historico').innerHTML =
       '<div class="empty-state"><div class="empty-icon">🔎</div>Encontrei mais de um cliente com esse nome. Escolha abaixo.</div>';
     document.getElementById('section-pendentes').style.display = 'none';
+    document.getElementById('consulta-pdf-wrap').style.display = 'none';
     document.getElementById('kpi-total').textContent = '—';
     document.getElementById('kpi-pago').textContent = '—';
     document.getElementById('kpi-pendente').textContent = '—';
@@ -2288,6 +2425,8 @@ function renderConsulta(data) {
 
   const pendentes = registros.filter(r => (r.pagamento||'').toLowerCase() === 'pendente');
   const secPend = document.getElementById('section-pendentes');
+  document.getElementById('consulta-pdf-wrap').style.display = pendentes.length > 0 ? '' : 'none';
+  document.getElementById('consulta-pdf-result').style.display = 'none';
   if (pendentes.length > 0) {
     secPend.style.display = '';
     document.getElementById('badge-pendentes').textContent = pendentes.length;
@@ -2323,6 +2462,166 @@ function marcarVendaComoPago(rowIndex) {
     showToast('✓ Venda marcada como paga!');
   })
   .catch(() => showToast('⚠️ Erro ao atualizar.'));
+}
+
+function setCobrancaModo(modo) {
+  cobrancaModo = modo === 'cliente' ? 'cliente' : 'empresa';
+  document.getElementById('cob-mode-empresa').classList.toggle('active', cobrancaModo === 'empresa');
+  document.getElementById('cob-mode-cliente').classList.toggle('active', cobrancaModo === 'cliente');
+  document.getElementById('cob-busca-label').textContent = cobrancaModo === 'empresa' ? 'Empresa' : 'Cliente';
+  document.getElementById('cob-busca').placeholder = cobrancaModo === 'empresa' ? 'Ex: Vital, DFR...' : 'Ex: Felipe, Gabi...';
+}
+
+function cobrancaParams(extra = {}) {
+  const params = new URLSearchParams({
+    action: extra.action || 'pendencias',
+    modo: extra.modo || cobrancaModo,
+    q: extra.q !== undefined ? extra.q : document.getElementById('cob-busca').value.trim()
+  });
+  const inicio = extra.inicio !== undefined ? extra.inicio : document.getElementById('cob-inicio').value;
+  const fim = extra.fim !== undefined ? extra.fim : document.getElementById('cob-fim').value;
+  if (inicio) params.set('inicio', inicio);
+  if (fim) params.set('fim', fim);
+  if (extra.clienteExato) params.set('clienteExato', extra.clienteExato);
+  if (extra.empresaExata) params.set('empresaExata', extra.empresaExata);
+  return params;
+}
+
+function consultarPendencias() {
+  const q = document.getElementById('cob-busca').value.trim();
+  if (!q) { showToast('⚠️ Informe o termo da busca'); return; }
+  document.getElementById('cob-pdf-result').style.display = 'none';
+  document.getElementById('cob-lista').innerHTML =
+    '<div class="loading-state"><div class="spinner"></div>Buscando pendências...</div>';
+  showToast('Consultando pendências...');
+  fetch(`${SCRIPT_URL}?${cobrancaParams().toString()}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.status !== 'success') { showToast('⚠️ ' + (data.message || data.error || 'Erro na consulta')); return; }
+      renderPendencias(data);
+    })
+    .catch(() => {
+      document.getElementById('cob-lista').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">⚠️</div>Erro ao conectar. Verifique a conexão.</div>';
+      showToast('⚠️ Erro ao consultar pendências');
+    });
+}
+
+function renderPendencias(data) {
+  cobrancasData = data;
+  document.getElementById('cob-kpi-clientes').textContent = data.clientes || 0;
+  document.getElementById('cob-kpi-pedidos').textContent = data.pedidos || 0;
+  document.getElementById('cob-kpi-total').textContent = fmt(data.totalAberto || 0);
+  document.getElementById('cob-geral-actions').style.display = (data.grupos && data.grupos.length) ? '' : 'none';
+
+  if (!data.grupos || data.grupos.length === 0) {
+    document.getElementById('cob-lista').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">💬</div>Nenhuma pendência encontrada neste filtro.</div>';
+    return;
+  }
+
+  document.getElementById('cob-lista').innerHTML = data.grupos.map((g, idx) => `
+    <div class="charge-card">
+      <div class="charge-card-head">
+        <div>
+          <div class="charge-client">${idx + 1}. ${g.cliente || 'Sem nome'}</div>
+          <div class="charge-meta">${g.empresa || 'Sem empresa'} · ${g.periodoInicio || '—'} a ${g.periodoFim || '—'} · ${g.pedidos} pedido${g.pedidos !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="charge-total">${fmt(g.total)}</div>
+      </div>
+      <div class="charge-body">
+        ${(g.compras || []).map(c => `
+          <div class="charge-buy">
+            <div class="charge-buy-date">${c.data || '—'}</div>
+            <div class="charge-buy-itens">${c.itens || '—'}</div>
+            <div class="charge-buy-total">${fmt(c.total)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="charge-card-actions">
+        <button class="hist-pay-btn" type="button" onclick="gerarPdfPendenciasClienteIdx(${idx})">PDF deste cliente</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function limparCobrancas() {
+  cobrancasData = null;
+  document.getElementById('cob-busca').value = '';
+  document.getElementById('cob-inicio').value = '';
+  document.getElementById('cob-fim').value = '';
+  document.getElementById('cob-kpi-clientes').textContent = '0';
+  document.getElementById('cob-kpi-pedidos').textContent = '0';
+  document.getElementById('cob-kpi-total').textContent = 'R$ 0,00';
+  document.getElementById('cob-geral-actions').style.display = 'none';
+  document.getElementById('cob-pdf-result').style.display = 'none';
+  document.getElementById('cob-lista').innerHTML =
+    '<div class="empty-state"><div class="empty-icon">💬</div>Consulte uma empresa ou cliente para ver pendências.</div>';
+}
+
+function showPdfResult(data) {
+  const consultaAtiva = document.getElementById('page-consulta').classList.contains('active');
+  const box = consultaAtiva ? document.getElementById('consulta-pdf-result') : document.getElementById('cob-pdf-result');
+  box.style.display = '';
+  box.innerHTML = `
+    <div style="font-size:13px;font-weight:700;color:var(--green-ok);">PDF gerado com sucesso.</div>
+    <div style="font-size:12px;color:var(--gray-soft);margin-top:3px;">Abra o PDF, baixe ou compartilhe pelo WhatsApp.</div>
+    <a href="${data.url}" target="_blank" rel="noopener">Abrir PDF</a>
+  `;
+}
+
+function gerarPdfPendencias(params) {
+  showToast('Gerando PDF...');
+  document.getElementById('cob-pdf-result').style.display = 'none';
+  fetch(`${SCRIPT_URL}?${params.toString()}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.status !== 'success') { showToast('⚠️ ' + (data.message || data.error || 'Erro ao gerar PDF')); return; }
+      showPdfResult(data);
+      showToast('✓ PDF gerado!');
+    })
+    .catch(() => showToast('⚠️ Erro ao gerar PDF.'));
+}
+
+function gerarPdfPendenciasGeral() {
+  const q = document.getElementById('cob-busca').value.trim();
+  if (!q) { showToast('⚠️ Consulte as pendências primeiro'); return; }
+  gerarPdfPendencias(cobrancaParams({ action: 'gerar_pdf_pendencias' }));
+}
+
+function gerarPdfPendenciasCliente(cliente, empresa) {
+  const params = cobrancaParams({
+    action: 'gerar_pdf_pendencias',
+    modo: 'cliente',
+    q: cliente,
+    clienteExato: cliente,
+    empresaExata: empresa || ''
+  });
+  gerarPdfPendencias(params);
+}
+
+function gerarPdfPendenciasClienteIdx(idx) {
+  if (!cobrancasData || !cobrancasData.grupos || !cobrancasData.grupos[idx]) {
+    showToast('⚠️ Cliente não encontrado na lista');
+    return;
+  }
+  const g = cobrancasData.grupos[idx];
+  gerarPdfPendenciasCliente(g.cliente || '', g.empresa || '');
+}
+
+function gerarPdfConsultaCliente() {
+  if (!consultaAtual || !Array.isArray(consultaAtual.registros)) { showToast('⚠️ Consulte um cliente primeiro'); return; }
+  const pendentes = consultaAtual.registros.filter(r => (r.pagamento || '').toLowerCase() === 'pendente');
+  if (!pendentes.length) { showToast('ℹ️ Este cliente não tem pendências'); return; }
+  const base = pendentes[0];
+  const params = new URLSearchParams({
+    action: 'gerar_pdf_pendencias',
+    modo: 'cliente',
+    q: base.cliente || '',
+    clienteExato: base.cliente || '',
+    empresaExata: base.empresa || ''
+  });
+  gerarPdfPendencias(params);
 }
 
 function toggleEncForm() {
