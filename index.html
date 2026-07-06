@@ -1829,7 +1829,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyf3QhhIz-pJuC-QcTEmk5q5Hm7zN6v4v4tRt4fH5pPrQbs_IDeH3Q6OXqXWeQ14I0L/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygk1q8BZMOLUiHVuCmhlb0m5Qg2jOD-OGEKeHJEkpKZ9u--O6Tncx8SMxmbgtnuc4/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -2598,37 +2598,34 @@ function showPdfResult(data) {
 }
 
 function gerarPdfPendencias(params) {
-  showToast('Gerando PDF...');
+  // Nao abrir uma pagina em branco de "Gerando..." no iPhone/PWA.
+  // A mensagem fica apenas no toast do proprio app; depois o resultado aparece com os botoes.
+  showToast('Gerando PDF da Donna Clô...', 0);
   esconderResultadosPdf();
-
-  // Abrimos uma aba imediatamente no clique para evitar bloqueio de pop-up.
-  // Quando o PDF terminar de gerar, essa aba recebe o link do arquivo.
-  const pdfWindow = window.open('', '_blank');
-  if (pdfWindow) {
-    pdfWindow.document.write('<div style="font-family:Arial,sans-serif;padding:24px;color:#3D1F0A;">Gerando PDF da Donna Clô...</div>');
-  }
 
   fetch(`${SCRIPT_URL}?${params.toString()}`)
     .then(r => r.json())
     .then(data => {
       if (data.status !== 'success') {
-        if (pdfWindow) pdfWindow.close();
-        showToast('⚠️ ' + (data.message || data.error || 'Erro ao gerar PDF'));
+        showToast('⚠️ ' + (data.message || data.error || 'Erro ao gerar PDF'), 3500);
         return;
       }
 
-      if (pdfWindow) {
-        pdfWindow.location.href = data.url;
-      } else {
-        window.open(data.url, '_blank');
+      showPdfResult(data);
+
+      // Tenta abrir o Drive automaticamente. Se o navegador bloquear, o botao "Abrir PDF" fica na tela.
+      let abriu = false;
+      try {
+        const win = window.open(data.url, '_blank', 'noopener');
+        abriu = !!win;
+      } catch (e) {
+        abriu = false;
       }
 
-      showPdfResult(data);
-      showToast('✓ PDF gerado!');
+      showToast(abriu ? '✓ PDF gerado! Abrindo Drive...' : '✓ PDF gerado! Toque em Abrir PDF.', 2600);
     })
     .catch(() => {
-      if (pdfWindow) pdfWindow.close();
-      showToast('⚠️ Erro ao gerar PDF.');
+      showToast('⚠️ Erro ao gerar PDF.', 3500);
     });
 }
 
@@ -3807,11 +3804,19 @@ function salvarInsumo(i) {
 }
 
 // ── TOAST ───────────────────────────────────────────────
-function showToast(msg) {
+let toastTimer = null;
+function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
+  if (!t) return;
+  if (toastTimer) clearTimeout(toastTimer);
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  if (duration && duration > 0) {
+    toastTimer = setTimeout(() => {
+      t.classList.remove('show');
+      toastTimer = null;
+    }, duration);
+  }
 }
 </script>
 </body>
