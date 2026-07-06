@@ -1829,7 +1829,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4M94I4Y63Yx_9TtHt5Vn3caiKdP1FvlqgIuqvCjrKSJKyNy2ubuvdbAFnq_JIkAh5/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyf3QhhIz-pJuC-QcTEmk5q5Hm7zN6v4v4tRt4fH5pPrQbs_IDeH3Q6OXqXWeQ14I0L/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -2559,29 +2559,79 @@ function limparCobrancas() {
     '<div class="empty-state"><div class="empty-icon">💬</div>Consulte uma empresa ou cliente para ver pendências.</div>';
 }
 
-function showPdfResult(data) {
+function getActivePdfResultBox() {
   const consultaAtiva = document.getElementById('page-consulta').classList.contains('active');
-  const box = consultaAtiva ? document.getElementById('consulta-pdf-result') : document.getElementById('cob-pdf-result');
+  return consultaAtiva ? document.getElementById('consulta-pdf-result') : document.getElementById('cob-pdf-result');
+}
+
+function esconderResultadosPdf() {
+  ['cob-pdf-result', 'consulta-pdf-result'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+function showPdfResult(data) {
+  const box = getActivePdfResultBox();
+  const url = data.url || '#';
+  const downloadUrl = data.downloadUrl || url;
+  const whatsappText = encodeURIComponent(
+    data.whatsappText || `Olá! Segue o PDF de pendências da Donna Clô: ${url}`
+  );
+  const whatsappUrl = `https://wa.me/?text=${whatsappText}`;
+  const compartilhado = data.compartilhamento === 'link';
+
   box.style.display = '';
   box.innerHTML = `
-    <div style="font-size:13px;font-weight:700;color:var(--green-ok);">PDF gerado com sucesso.</div>
-    <div style="font-size:12px;color:var(--gray-soft);margin-top:3px;">Abra o PDF, baixe ou compartilhe pelo WhatsApp.</div>
-    <a href="${data.url}" target="_blank" rel="noopener">Abrir PDF</a>
+    <div style="font-size:13px;font-weight:800;color:var(--green-ok);">PDF gerado com sucesso.</div>
+    <div style="font-size:12px;color:var(--gray-soft);margin-top:4px;line-height:1.45;">
+      ${compartilhado
+        ? 'O link foi liberado para visualização de quem receber. Você também pode baixar e enviar como documento no WhatsApp.'
+        : 'O arquivo está privado no seu Drive. Baixe o PDF e envie como documento pelo WhatsApp.'}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <a href="${url}" target="_blank" rel="noopener" style="margin-top:0;">Abrir PDF</a>
+      <a href="${downloadUrl}" target="_blank" rel="noopener" style="margin-top:0;background:var(--brown-light);">Baixar PDF</a>
+      <a href="${whatsappUrl}" target="_blank" rel="noopener" style="margin-top:0;background:#25D366;color:#fff;">WhatsApp</a>
+    </div>
   `;
 }
 
 function gerarPdfPendencias(params) {
   showToast('Gerando PDF...');
-  document.getElementById('cob-pdf-result').style.display = 'none';
+  esconderResultadosPdf();
+
+  // Abrimos uma aba imediatamente no clique para evitar bloqueio de pop-up.
+  // Quando o PDF terminar de gerar, essa aba recebe o link do arquivo.
+  const pdfWindow = window.open('', '_blank');
+  if (pdfWindow) {
+    pdfWindow.document.write('<div style="font-family:Arial,sans-serif;padding:24px;color:#3D1F0A;">Gerando PDF da Donna Clô...</div>');
+  }
+
   fetch(`${SCRIPT_URL}?${params.toString()}`)
     .then(r => r.json())
     .then(data => {
-      if (data.status !== 'success') { showToast('⚠️ ' + (data.message || data.error || 'Erro ao gerar PDF')); return; }
+      if (data.status !== 'success') {
+        if (pdfWindow) pdfWindow.close();
+        showToast('⚠️ ' + (data.message || data.error || 'Erro ao gerar PDF'));
+        return;
+      }
+
+      if (pdfWindow) {
+        pdfWindow.location.href = data.url;
+      } else {
+        window.open(data.url, '_blank');
+      }
+
       showPdfResult(data);
       showToast('✓ PDF gerado!');
     })
-    .catch(() => showToast('⚠️ Erro ao gerar PDF.'));
+    .catch(() => {
+      if (pdfWindow) pdfWindow.close();
+      showToast('⚠️ Erro ao gerar PDF.');
+    });
 }
+
 
 function gerarPdfPendenciasGeral() {
   const q = document.getElementById('cob-busca').value.trim();
