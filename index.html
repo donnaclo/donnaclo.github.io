@@ -1458,7 +1458,8 @@
 
     <div class="field" style="margin-bottom:0;">
       <label id="cob-busca-label">Empresa</label>
-      <input type="text" id="cob-busca" class="search-input" placeholder="Ex: Vital, DFR..." autocomplete="off" onkeydown="if(event.key==='Enter') consultarPendencias()">
+      <input type="text" id="cob-busca" class="search-input" placeholder="Ex: Vital, DFR..." autocomplete="off" oninput="handleCobBuscaInput()" onfocus="handleCobBuscaInput()" onkeydown="if(event.key==='Enter') consultarPendencias()">
+      <div id="cob-client-suggestions" style="display:none; margin-top:8px;"></div>
     </div>
 
     <div class="charge-date-grid">
@@ -1822,7 +1823,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgxRNkZTdxyYcAWoKbmXjsMb4SURAXfJ2jy_Ze3UJmJy1PXwQkU1C-xNQ-RVq1_-HT/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4M94I4Y63Yx_9TtHt5Vn3caiKdP1FvlqgIuqvCjrKSJKyNy2ubuvdbAFnq_JIkAh5/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -2444,7 +2445,75 @@ function setCobrancaModo(modo) {
   document.getElementById('cob-mode-empresa').classList.toggle('active', cobrancaModo === 'empresa');
   document.getElementById('cob-mode-cliente').classList.toggle('active', cobrancaModo === 'cliente');
   document.getElementById('cob-busca-label').textContent = cobrancaModo === 'empresa' ? 'Empresa' : 'Cliente';
-  document.getElementById('cob-busca').placeholder = cobrancaModo === 'empresa' ? 'Ex: Vital, DFR...' : 'Ex: Felipe, Gabi...';
+
+  const busca = document.getElementById('cob-busca');
+  busca.placeholder = cobrancaModo === 'empresa' ? 'Ex: Vital, DFR...' : 'Ex: Felipe, Gabi...';
+
+  // No modo cliente, usa a mesma base de nomes salvos da tela Consultar Cliente.
+  // No modo empresa, removemos a lista para não sugerir nomes de clientes quando a busca é por empresa.
+  if (cobrancaModo === 'cliente') {
+    busca.setAttribute('list', 'clientes-list');
+    handleCobBuscaInput();
+  } else {
+    busca.removeAttribute('list');
+    hideCobClientSuggestions();
+  }
+}
+
+function handleCobBuscaInput() {
+  if (cobrancaModo !== 'cliente') {
+    hideCobClientSuggestions();
+    return;
+  }
+
+  const input = document.getElementById('cob-busca');
+  const termo = input.value.trim();
+
+  // Se o campo estiver vazio, mostra alguns nomes salvos para facilitar no celular.
+  // Se tiver texto, filtra igual a consulta de cliente.
+  const matches = termo
+    ? getMatchingClientes(termo)
+    : allClientes.slice(0, 8);
+
+  renderCobClientSuggestions(matches);
+}
+
+function renderCobClientSuggestions(matches) {
+  const box = document.getElementById('cob-client-suggestions');
+  if (!box) return;
+
+  if (!matches || !matches.length) {
+    hideCobClientSuggestions();
+    return;
+  }
+
+  box.style.display = '';
+  box.innerHTML = `
+    <div class="client-suggestion-wrap">
+      <div class="client-suggestion-title">Clientes salvos encontrados:</div>
+      <div class="client-suggestion-list">
+        ${matches.slice(0, 8).map(nome => `
+          <button class="client-suggestion-btn" type="button" onclick='selecionarCobrancaCliente(${JSON.stringify(nome)})'>
+            ${nome}
+            <div class="client-suggestion-meta">Toque para consultar as pendências deste cliente</div>
+          </button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function selecionarCobrancaCliente(nome) {
+  setCobrancaModo('cliente');
+  document.getElementById('cob-busca').value = nome;
+  hideCobClientSuggestions();
+  consultarPendencias();
+}
+
+function hideCobClientSuggestions() {
+  const box = document.getElementById('cob-client-suggestions');
+  if (!box) return;
+  box.style.display = 'none';
+  box.innerHTML = '';
 }
 
 function cobrancaParams(extra = {}) {
@@ -2465,6 +2534,7 @@ function cobrancaParams(extra = {}) {
 function consultarPendencias() {
   const q = document.getElementById('cob-busca').value.trim();
   if (!q) { showToast('⚠️ Informe o termo da busca'); return; }
+  hideCobClientSuggestions();
   document.getElementById('cob-pdf-result').style.display = 'none';
   document.getElementById('cob-lista').innerHTML =
     '<div class="loading-state"><div class="spinner"></div>Buscando pendências...</div>';
@@ -2522,6 +2592,7 @@ function renderPendencias(data) {
 
 function limparCobrancas() {
   cobrancasData = null;
+  hideCobClientSuggestions();
   document.getElementById('cob-busca').value = '';
   document.getElementById('cob-inicio').value = '';
   document.getElementById('cob-fim').value = '';
