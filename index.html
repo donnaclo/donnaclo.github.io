@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><meta name="donna-clo-version" content="1.0.9-fix-vendas">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"><meta name="donna-clo-version" content="1.0.10-nutella">
 <title>Donna Clô</title>
 
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1330,6 +1330,7 @@
   <div class="product-row" id="row-mineirinho"><div class="product-info"><div class="product-name">Mineirinho</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('mineirinho',-1)">−</button><span class="qty-display" id="qty-mineirinho">0</span><button class="qty-btn" onclick="changeQty('mineirinho',1)">+</button></div></div>
   <div class="product-row" id="row-toalha_felpuda"><div class="product-info"><div class="product-name">Toalha Felpuda</div><div class="product-price">R$ 13,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('toalha_felpuda',-1)">−</button><span class="qty-display" id="qty-toalha_felpuda">0</span><button class="qty-btn" onclick="changeQty('toalha_felpuda',1)">+</button></div></div>
   <div class="product-row" id="row-choconinho"><div class="product-info"><div class="product-name">ChocoNinho</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('choconinho',-1)">−</button><span class="qty-display" id="qty-choconinho">0</span><button class="qty-btn" onclick="changeQty('choconinho',1)">+</button></div></div>
+  <div class="product-row" id="row-nutella"><div class="product-info"><div class="product-name">Nutella</div><div class="product-price">R$ 15,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('nutella',-1)">−</button><span class="qty-display" id="qty-nutella">0</span><button class="qty-btn" onclick="changeQty('nutella',1)">+</button></div></div>
 
   <div class="cat-header">🍮 Sobremesas no Pote</div>
   <div class="product-row" id="row-morango_pote"><div class="product-info"><div class="product-name">Morango (pote)</div><div class="product-price">R$ 18,00 / un.</div></div><div class="qty-control"><button class="qty-btn" onclick="changeQty('morango_pote',-1)">−</button><span class="qty-display" id="qty-morango_pote">0</span><button class="qty-btn" onclick="changeQty('morango_pote',1)">+</button></div></div>
@@ -1825,7 +1826,7 @@
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbTJ-xnfN9W4XYB7r-vIuohDP-ZTt4PPGEfnuLLt8V8g5Rq48yB7qNlKpmZxcwYDGj/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJSUBxCgJIHvazNmiKZOSx7DzAkBKOcdyQHyeQf1amc0GjeBMmAQBLhZGt-F9271Q/exec';
 
 // ── PRODUCTS ────────────────────────────────────────────
 const PRODUCTS = {  
@@ -1848,6 +1849,7 @@ const PRODUCTS = {
   mineirinho:        { name: 'Mineirinho',              price: 15 },
   toalha_felpuda:    { name: 'Toalha Felpuda',          price: 13 },
   choconinho:        { name: 'ChocoNinho',              price: 15 },
+  nutella:           { name: 'Nutella',                 price: 15 },
   morango_pote:      { name: 'Morango (pote)',           price: 18 },
   abacaxi_coco:      { name: 'Abacaxi c/ Coco (pote)', price: 18 },
   morangoffee:       { name: 'Morangoffee',             price: 18 },
@@ -3276,6 +3278,7 @@ const RESERVA_ALIASES = {
   'toalha felpuda': 'toalha_felpuda',
   'choconinho': 'choconinho',
   'choco ninho': 'choconinho',
+  'nutella': 'nutella',
   'morango pote': 'morango_pote',
   'abacaxi c coco pote': 'abacaxi_coco',
   'abacaxi com coco pote': 'abacaxi_coco',
